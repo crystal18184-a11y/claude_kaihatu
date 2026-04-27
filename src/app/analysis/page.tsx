@@ -18,7 +18,7 @@ export default function AnalysisPage() {
   const totalSpent = receipts.reduce((sum, r) => sum + r.total, 0);
 
   // カテゴリ別集計
-  const majorTotals = {};
+  const majorTotals: Record<string, number> = {};
   receipts.forEach(r => r.items.forEach((item: Item) => {
     const cat = item.majorCategory || "娯楽・その他";
     majorTotals[cat] = (majorTotals[cat] || 0) + item.price;
