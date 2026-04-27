@@ -2,30 +2,50 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
+import type { MajorCategory } from "@/types";
 
-const EMOJI = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・麺類":"🍚","調味料・油":"🧂","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","外食・テイクアウト":"🍱","外食・ドリンク":"🥤","外食・デザート":"🍰","レジャー・観光フード":"🎡","交通・外出":"🚃","趣味・娯楽":"🎮","サブスク・定額サービス":"📺","家賃・住宅費":"🏠","水道・光熱費":"💡","通信費":"📶","保険料":"🛡️","その他固定費":"💳","その他":"📦"};
-const MAJOR_MAP = {"肉類":"食費","魚介類":"食費","卵":"食費","乳製品":"食費","野菜":"食費","果物":"食費","きのこ":"食費","海藻・乾物":"食費","豆腐・大豆製品":"食費","漬物・発酵食品":"食費","パン":"食費","米・麺類":"食費","調味料・油":"食費","飲み物":"食費","お菓子・スナック":"食費","アイス・冷菓":"食費","冷凍食品":"食費","レトルト・缶詰":"食費","日用品":"日用品・生活","医療・薬":"日用品・生活","化粧品・美容":"日用品・生活","衣服・靴":"ファッション","バッグ・アクセサリー":"ファッション","家電":"電化製品・家電","スマホ・PC・ガジェット":"電化製品・家電","子ども用品":"子ども・教育","文具・おもちゃ":"子ども・教育","習い事・教育費":"子ども・教育","外食・テイクアウト":"娯楽・その他","外食・ドリンク":"娯楽・その他","外食・デザート":"娯楽・その他","レジャー・観光フード":"娯楽・その他","交通・外出":"娯楽・その他","趣味・娯楽":"娯楽・その他","サブスク・定額サービス":"固定費・サブスク","家賃・住宅費":"固定費・サブスク","水道・光熱費":"固定費・サブスク","通信費":"固定費・サブスク","保険料":"固定費・サブスク","その他固定費":"固定費・サブスク","その他":"娯楽・その他"};
+interface ScannedItem {
+  id?: string;
+  name: string;
+  price: number;
+  quantity: number;
+  majorCategory: string;
+  category: string;
+  sub?: string;
+  wasteTags?: string[];
+}
+
+interface ScannedReceipt {
+  date: string;
+  store: string;
+  storeType: string;
+  total: number;
+  items: ScannedItem[];
+}
+
+const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・麺類":"🍚","調味料・油":"🧂","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","外食・テイクアウト":"🍱","外食・ドリンク":"🥤","外食・デザート":"🍰","レジャー・観光フード":"🎡","交通・外出":"🚃","趣味・娯楽":"🎮","サブスク・定額サービス":"📺","家賃・住宅費":"🏠","水道・光熱費":"💡","通信費":"📶","保険料":"🛡️","その他固定費":"💳","その他":"📦"};
+const MAJOR_MAP: Record<string, string> = {"肉類":"食費","魚介類":"食費","卵":"食費","乳製品":"食費","野菜":"食費","果物":"食費","きのこ":"食費","海藻・乾物":"食費","豆腐・大豆製品":"食費","漬物・発酵食品":"食費","パン":"食費","米・麺類":"食費","調味料・油":"食費","飲み物":"食費","お菓子・スナック":"食費","アイス・冷菓":"食費","冷凍食品":"食費","レトルト・缶詰":"食費","日用品":"日用品・生活","医療・薬":"日用品・生活","化粧品・美容":"日用品・生活","衣服・靴":"ファッション","バッグ・アクセサリー":"ファッション","家電":"電化製品・家電","スマホ・PC・ガジェット":"電化製品・家電","子ども用品":"子ども・教育","文具・おもちゃ":"子ども・教育","習い事・教育費":"子ども・教育","外食・テイクアウト":"娯楽・その他","外食・ドリンク":"娯楽・その他","外食・デザート":"娯楽・その他","レジャー・観光フード":"娯楽・その他","交通・外出":"娯楽・その他","趣味・娯楽":"娯楽・その他","サブスク・定額サービス":"固定費・サブスク","家賃・住宅費":"固定費・サブスク","水道・光熱費":"固定費・サブスク","通信費":"固定費・サブスク","保険料":"固定費・サブスク","その他固定費":"固定費・サブスク","その他":"娯楽・その他"};
 const ALL_CATS = Object.keys(EMOJI);
 
 export default function ScanPage() {
   const router = useRouter();
   const { addReceipt, getSimilarStores } = useStore();
-  const cameraRef = useRef(null);
-  const photoRef = useRef(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState("select");
   const [progress, setProgress] = useState(0);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [result, setResult] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [result, setResult] = useState<ScannedReceipt | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [editDate, setEditDate] = useState("");
   const [editStore, setEditStore] = useState("");
   const [editTotal, setEditTotal] = useState(0);
-  const [editItems, setEditItems] = useState([]);
-  const [similarStores, setSimilarStores] = useState([]);
-  const [editingItemIndex, setEditingItemIndex] = useState(null);
-  const [categoryModal, setCategoryModal] = useState(null);
+  const [editItems, setEditItems] = useState<ScannedItem[]>([]);
+  const [similarStores, setSimilarStores] = useState<{ name: string; type: string }[]>([]);
+  const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
+  const [categoryModal, setCategoryModal] = useState<number | null>(null);
 
-  const fixOrientation = (dataUrl) => new Promise((resolve) => {
+  const fixOrientation = (dataUrl: string): Promise<string> => new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
       const arr = dataUrl.split(",")[1];
@@ -58,7 +78,7 @@ export default function ScanPage() {
         }
       }
       const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d")!;
       const MAX = 1200;
       let w = img.width, h = img.height;
       const ratio = Math.min(MAX / w, MAX / h, 1);
@@ -82,15 +102,15 @@ export default function ScanPage() {
     img.src = dataUrl;
   });
 
-  const handleFile = async (file) => {
+  const handleFile = async (file: File) => {
     if (!file) return;
     setPreviewUrl(URL.createObjectURL(file));
     setPhase("loading");
     setProgress(10);
     try {
-      const dataUrl = await new Promise((res, rej) => {
+      const dataUrl = await new Promise<string>((res, rej) => {
         const reader = new FileReader();
-        reader.onload = () => res(reader.result);
+        reader.onload = () => res(reader.result as string);
         reader.onerror = () => rej(new Error("読み込み失敗"));
         reader.readAsDataURL(file);
       });
@@ -111,11 +131,11 @@ export default function ScanPage() {
       setEditDate(data.data.date ?? "");
       setEditStore(data.data.store ?? "");
       setEditTotal(data.data.total ?? 0);
-      setEditItems((data.data.items ?? []).map(item => ({ ...item, quantity: item.quantity || 1 })));
+      setEditItems((data.data.items ?? []).map((item: ScannedItem) => ({ ...item, quantity: item.quantity || 1 })));
       setSimilarStores(getSimilarStores(data.data.store ?? ""));
       setPhase("confirm");
     } catch (e) {
-      setErrorMsg(e.message ?? "エラー");
+      setErrorMsg(e instanceof Error ? e.message : "エラー");
       setPhase("error");
     }
   };
@@ -133,7 +153,7 @@ export default function ScanPage() {
       };
       addReceipt(receipt);
       window.location.href = "/";
-    } catch (e) { alert("エラー: " + e.message); }
+    } catch (e) { alert("エラー: " + (e instanceof Error ? e.message : String(e))); }
   };
 
   const reset = () => {
@@ -141,10 +161,10 @@ export default function ScanPage() {
     setResult(null); setErrorMsg(""); setEditingItemIndex(null); setCategoryModal(null);
   };
 
-  const updateItem = (index, updates) => {
+  const updateItem = (index: number, updates: Partial<ScannedItem>) => {
     const updated = [...editItems];
     updated[index] = { ...updated[index], ...updates };
-    if (updates.category) updated[index].majorCategory = MAJOR_MAP[updates.category] || "娯楽・その他";
+    if (updates.category) updated[index].majorCategory = (MAJOR_MAP[updates.category] || "娯楽・その他") as MajorCategory;
     setEditItems(updated);
   };
 

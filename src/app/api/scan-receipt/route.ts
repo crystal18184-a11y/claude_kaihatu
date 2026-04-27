@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import type { Item } from "@/types";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -72,8 +73,8 @@ export async function POST(req: NextRequest) {
     const parsed = JSON.parse(text.slice(start, end + 1));
 
     // 同じ商品名をまとめる処理
-    const mergedItems = [];
-    parsed.items.forEach((item) => {
+    const mergedItems: Omit<Item, "id">[] = [];
+    parsed.items.forEach((item: Omit<Item, "id">) => {
       const existing = mergedItems.find((m) => m.name === item.name && m.category === item.category);
       if (existing) {
         existing.quantity = (existing.quantity || 1) + (item.quantity || 1);
