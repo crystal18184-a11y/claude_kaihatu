@@ -107,7 +107,7 @@ export default function SettingsPage() {
               <span className="text-2xl">{EMOJI[f.category] ?? "💳"}</span>
               <div className="flex-1">
                 <div className="font-bold text-sm">{f.name}</div>
-                <div className="text-xs text-gray-400">毎月{f.dayOfMonth}日 ¥{f.amount.toLocaleString()}</div>
+                <div className="text-xs text-gray-600">毎月{f.dayOfMonth}日 ¥{f.amount.toLocaleString()}</div>
               </div>
               <button onClick={() => updateFixedCost(f.id, { enabled: !f.enabled })}
                 className={`text-xs px-2 py-1 rounded-lg font-bold ${f.enabled ? "bg-rose-100 text-rose-400" : "bg-gray-100 text-gray-400"}`}>
@@ -121,25 +121,25 @@ export default function SettingsPage() {
           {showAddFixed ? (
             <div className="mt-4 p-3 bg-rose-50 rounded-xl">
               <div className="mb-2">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">サービス名</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">サービス名</label>
                 <input type="text" value={newFixed.name} onChange={(e) => setNewFixed(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="例：Netflix、電気代"
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400 bg-white" />
               </div>
               <div className="flex gap-2 mb-2">
                 <div className="flex-1">
-                  <label className="text-xs text-gray-400 font-bold mb-1 block">金額</label>
+                  <label className="text-xs text-gray-600 font-semibold mb-1 block">金額</label>
                   <input type="number" value={newFixed.amount} onChange={(e) => setNewFixed(prev => ({ ...prev, amount: Number(e.target.value) }))}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400 bg-white" />
                 </div>
                 <div className="flex-1">
-                  <label className="text-xs text-gray-400 font-bold mb-1 block">毎月何日</label>
+                  <label className="text-xs text-gray-600 font-semibold mb-1 block">毎月何日</label>
                   <input type="number" min="1" max="31" value={newFixed.dayOfMonth} onChange={(e) => setNewFixed(prev => ({ ...prev, dayOfMonth: Number(e.target.value) }))}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400 bg-white" />
                 </div>
               </div>
               <div className="mb-2">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">カテゴリ</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">カテゴリ</label>
                 <button onClick={() => setCategoryModal(true)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-left flex items-center gap-2 bg-white">
                   <span>{EMOJI[newFixed.category] ?? "📦"}</span>
@@ -147,7 +147,7 @@ export default function SettingsPage() {
                 </button>
               </div>
               <div className="mb-3">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">種類</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">種類</label>
                 <select value={newFixed.storeType} onChange={(e) => setNewFixed(prev => ({ ...prev, storeType: e.target.value }))}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400 bg-white">
                   {STORE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -180,15 +180,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 pb-[env(safe-area-inset-bottom,0px)]">
-        <div className="flex">
-          <button onClick={() => router.push("/")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">🏠</span>ホーム</button>
-          <button onClick={() => router.push("/history")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">📅</span>履歴</button>
-          <button onClick={() => router.push("/scan")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><div className="-mt-4 w-12 h-12 bg-gradient-to-r from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg">+</div></button>
-          <button onClick={() => router.push("/analysis")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">📊</span>分析</button>
-          <button onClick={() => router.push("/settings")} className="flex-1 py-3 flex flex-col items-center text-xs text-rose-400"><span className="text-lg">⚙️</span>設定</button>
-        </div>
-      </div>
     </div>
   );
 }

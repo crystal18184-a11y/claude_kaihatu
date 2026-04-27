@@ -35,11 +35,27 @@ input, select, textarea {
   font-size: 16px;
 }
 
-@keyframes page-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
+/* ─── Page transition animations ─── */
+
+@keyframes slide-from-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-from-left {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fade-in-page {
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-.page-transition {
-  animation: page-fade-in 0.22s ease-out both;
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
 }
+
+/* backwards: from-state applied before start, no fill after end (avoids transform containing-block side effect) */
+.page-forward  { animation: slide-from-right 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) backwards; }
+.page-backward { animation: slide-from-left  0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) backwards; }
+.page-fade     { animation: fade-in-page     0.22s ease-out backwards; }
+.sheet-up      { animation: sheet-up         0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards; }

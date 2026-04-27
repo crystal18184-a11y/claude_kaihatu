@@ -118,12 +118,12 @@ export default function Home() {
           <div className="relative bg-white rounded-t-3xl w-full max-w-md p-4 pb-8">
             <div className="font-bold text-gray-700 mb-4 text-center">商品を編集</div>
             <div className="mb-3">
-              <label className="text-xs text-gray-400 font-bold mb-1 block">商品名</label>
+              <label className="text-xs text-gray-600 font-semibold mb-1 block">商品名</label>
               <input type="text" value={editingItem.name} onChange={(e) => setEditingItem(prev => prev ? { ...prev, name: e.target.value } : null)}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
             </div>
             <div className="mb-3">
-              <label className="text-xs text-gray-400 font-bold mb-1 block">カテゴリ</label>
+              <label className="text-xs text-gray-600 font-semibold mb-1 block">カテゴリ</label>
               <button onClick={() => setCategoryModal(true)}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-left flex items-center gap-2">
                 <span>{EMOJI[editingItem.category] ?? "📦"}</span>
@@ -132,12 +132,12 @@ export default function Home() {
             </div>
             <div className="flex gap-3 mb-4">
               <div className="flex-1">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">単価</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">単価</label>
                 <input type="number" value={editingItem.price} onChange={(e) => setEditingItem(prev => prev ? { ...prev, price: Number(e.target.value) } : null)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
               </div>
               <div className="flex-1">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">個数</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">個数</label>
                 <input type="number" value={editingItem.quantity} onChange={(e) => setEditingItem(prev => prev ? { ...prev, quantity: Number(e.target.value) } : null)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
               </div>
@@ -171,7 +171,7 @@ export default function Home() {
       <div className="p-4">
         <div className="bg-white rounded-2xl p-4 shadow-sm">
           <div className="grid grid-cols-7 mb-2">
-            {["日","月","火","水","木","金","土"].map((d) => (<div key={d} className="text-center text-xs text-gray-400 font-bold">{d}</div>))}
+            {["日","月","火","水","木","金","土"].map((d) => (<div key={d} className="text-center text-xs text-gray-500 font-bold">{d}</div>))}
           </div>
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((day, i) => {
@@ -183,7 +183,7 @@ export default function Home() {
               const hasReceipt = dayTotal > 0;
               return (
                 <button key={i} onClick={() => setSelectedDate(isSelected ? null : date)}
-                  className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs transition-all ${isSelected ? "bg-rose-400 text-white" : ""} ${isToday && !isSelected ? "border-2 border-rose-400" : ""} ${hasReceipt && !isSelected ? "bg-rose-50" : ""}`}>
+                  className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs text-gray-700 transition-all ${isSelected ? "bg-rose-400 text-white" : ""} ${isToday && !isSelected ? "border-2 border-rose-400 text-rose-500 font-bold" : ""} ${hasReceipt && !isSelected ? "bg-rose-50" : ""}`}>
                   <span className={hasReceipt ? "font-bold" : ""}>{day}</span>
                   {hasReceipt && <span className={`text-xs ${isSelected ? "text-white" : "text-rose-400"}`}>¥{(dayTotal/1000).toFixed(0)}k</span>}
                 </button>
@@ -203,15 +203,15 @@ export default function Home() {
                   {editingReceipt === receipt.id ? (
                     <div className="p-4">
                       <div className="mb-3">
-                        <label className="text-xs text-gray-400 font-bold mb-1 block">日付</label>
+                        <label className="text-xs text-gray-600 font-semibold mb-1 block">日付</label>
                         <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
                       </div>
                       <div className="mb-3">
-                        <label className="text-xs text-gray-400 font-bold mb-1 block">店名</label>
+                        <label className="text-xs text-gray-600 font-semibold mb-1 block">店名</label>
                         <input type="text" value={editStore} onChange={(e) => setEditStore(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
                       </div>
                       <div className="mb-4">
-                        <label className="text-xs text-gray-400 font-bold mb-1 block">合計金額</label>
+                        <label className="text-xs text-gray-600 font-semibold mb-1 block">合計金額</label>
                         <input type="number" value={editTotal} onChange={(e) => setEditTotal(Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
                       </div>
                       <div className="flex gap-2">
@@ -224,7 +224,7 @@ export default function Home() {
                       <div className="flex justify-between items-center p-4 border-b border-rose-50">
                         <div>
                           <div className="font-bold text-sm">{receipt.store}</div>
-                          <div className="text-xs text-gray-400">{receipt.storeType}</div>
+                          <div className="text-xs text-gray-600">{receipt.storeType}</div>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="font-bold text-rose-400 text-lg">¥{receipt.total.toLocaleString()}</div>
@@ -267,15 +267,6 @@ export default function Home() {
         )}
       </div>
 
-      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 pb-[env(safe-area-inset-bottom,0px)]">
-        <div className="flex">
-          <button onClick={() => router.push("/")} className="flex-1 py-3 flex flex-col items-center text-xs text-rose-400"><span className="text-lg">🏠</span>ホーム</button>
-          <button onClick={() => router.push("/history")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">📅</span>履歴</button>
-          <button onClick={() => router.push("/scan")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><div className="-mt-4 w-12 h-12 bg-gradient-to-r from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg">+</div></button>
-          <button onClick={() => router.push("/analysis")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">📊</span>分析</button>
-          <button onClick={() => router.push("/settings")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">⚙️</span>設定</button>
-        </div>
-      </div>
     </div>
   );
 }

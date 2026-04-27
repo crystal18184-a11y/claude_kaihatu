@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
+import { useNavStore } from "@/store/navStore";
 import type { MajorCategory } from "@/types";
 
 interface ScannedItem {
@@ -30,6 +31,7 @@ const ALL_CATS = Object.keys(EMOJI);
 export default function ScanPage() {
   const router = useRouter();
   const { addReceipt, getSimilarStores } = useStore();
+  const setDirection = useNavStore((s) => s.setDirection);
   const cameraRef = useRef<HTMLInputElement>(null);
   const photoRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState("select");
@@ -160,7 +162,8 @@ export default function ScanPage() {
         items: editItems.map((item) => ({ ...item, id: item.id || crypto.randomUUID(), wasteTags: item.wasteTags ?? [] })),
       };
       addReceipt(receipt);
-      window.location.href = "/";
+      setDirection("backward");
+      router.push("/");
     } catch (e) { alert("エラー: " + (e instanceof Error ? e.message : String(e))); }
   };
 
@@ -197,7 +200,7 @@ export default function ScanPage() {
       )}
 
       <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
-        <button onClick={() => router.push("/")} className="text-white text-sm mb-2 opacity-80">← 戻る</button>
+        <button onClick={() => { setDirection("backward"); router.push("/"); }} className="text-white text-sm mb-2 opacity-80">← 戻る</button>
         <div className="text-xl font-bold">レシートを追加</div>
       </div>
 
@@ -210,7 +213,7 @@ export default function ScanPage() {
               <div className="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0">📸</div>
               <div>
                 <div className="font-bold text-gray-700">カメラで撮影</div>
-                <div className="text-xs text-gray-400 mt-1">今すぐレシートを撮影してAIが読み取ります</div>
+                <div className="text-xs text-gray-500 mt-1">今すぐレシートを撮影してAIが読み取ります</div>
               </div>
             </button>
             <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden"
@@ -221,7 +224,7 @@ export default function ScanPage() {
               <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0">🖼️</div>
               <div>
                 <div className="font-bold text-gray-700">写真から選ぶ</div>
-                <div className="text-xs text-gray-400 mt-1">フォトライブラリからレシートの写真を選択します</div>
+                <div className="text-xs text-gray-500 mt-1">フォトライブラリからレシートの写真を選択します</div>
               </div>
             </button>
             <input ref={photoRef} type="file" accept="image/*" className="hidden"
@@ -232,7 +235,7 @@ export default function ScanPage() {
               <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0">✏️</div>
               <div>
                 <div className="font-bold text-gray-700">手動で入力</div>
-                <div className="text-xs text-gray-400 mt-1">サブスク・固定費など手動で記録します</div>
+                <div className="text-xs text-gray-500 mt-1">サブスク・固定費など手動で記録します</div>
               </div>
             </button>
           </div>
@@ -269,11 +272,11 @@ export default function ScanPage() {
                 <span className="font-bold text-green-600">読み取り完了！修正できます</span>
               </div>
               <div className="mb-3">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">日付</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">日付</label>
                 <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
               </div>
               <div className="mb-3">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">店名</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">店名</label>
                 <input type="text" value={editStore} onChange={(e) => setEditStore(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
                 {similarStores.length > 0 && (
                   <div className="mt-2">
@@ -287,7 +290,7 @@ export default function ScanPage() {
                 )}
               </div>
               <div className="mb-2">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">合計金額</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">合計金額</label>
                 <input type="number" value={editTotal} onChange={(e) => setEditTotal(Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
               </div>
             </div>
@@ -329,7 +332,7 @@ export default function ScanPage() {
                           {(item.quantity || 1) > 1 && <span className="text-rose-400 ml-1">×{item.quantity}</span>}
                           <span className="text-xs text-gray-300 ml-1">✏️</span>
                         </div>
-                        <div className="text-xs text-gray-400">{item.category}</div>
+                        <div className="text-xs text-gray-600">{item.category}</div>
                       </div>
                       <div className="font-bold text-sm text-gray-600 flex-shrink-0">
                         ¥{((item.price || 0) * (item.quantity || 1)).toLocaleString()}

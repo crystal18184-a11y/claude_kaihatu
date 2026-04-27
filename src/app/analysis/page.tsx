@@ -132,15 +132,6 @@ export default function AnalysisPage() {
         )}
       </div>
 
-      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 pb-[env(safe-area-inset-bottom,0px)]">
-        <div className="flex">
-          <button onClick={() => router.push("/")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">🏠</span>ホーム</button>
-          <button onClick={() => router.push("/history")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">📅</span>履歴</button>
-          <button onClick={() => router.push("/scan")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><div className="-mt-4 w-12 h-12 bg-gradient-to-r from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg">+</div></button>
-          <button onClick={() => router.push("/analysis")} className="flex-1 py-3 flex flex-col items-center text-xs text-rose-400"><span className="text-lg">📊</span>分析</button>
-          <button onClick={() => router.push("/settings")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">⚙️</span>設定</button>
-        </div>
-      </div>
     </div>
   );
 }

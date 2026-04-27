@@ -74,12 +74,12 @@ export default function HistoryPage() {
           <div className="relative bg-white rounded-t-3xl w-full max-w-md p-4 pb-8">
             <div className="font-bold text-gray-700 mb-4 text-center">商品を編集</div>
             <div className="mb-3">
-              <label className="text-xs text-gray-400 font-bold mb-1 block">商品名</label>
+              <label className="text-xs text-gray-600 font-semibold mb-1 block">商品名</label>
               <input type="text" value={editingItem.name} onChange={(e) => setEditingItem(prev => prev ? { ...prev, name: e.target.value } : null)}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
             </div>
             <div className="mb-3">
-              <label className="text-xs text-gray-400 font-bold mb-1 block">カテゴリ</label>
+              <label className="text-xs text-gray-600 font-semibold mb-1 block">カテゴリ</label>
               <button onClick={() => setCategoryModal(true)}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-left flex items-center gap-2">
                 <span>{EMOJI[editingItem.category] ?? "📦"}</span>
@@ -88,12 +88,12 @@ export default function HistoryPage() {
             </div>
             <div className="flex gap-3 mb-4">
               <div className="flex-1">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">単価</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">単価</label>
                 <input type="number" value={editingItem.price} onChange={(e) => setEditingItem(prev => prev ? { ...prev, price: Number(e.target.value) } : null)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
               </div>
               <div className="flex-1">
-                <label className="text-xs text-gray-400 font-bold mb-1 block">個数</label>
+                <label className="text-xs text-gray-600 font-semibold mb-1 block">個数</label>
                 <input type="number" value={editingItem.quantity} onChange={(e) => setEditingItem(prev => prev ? { ...prev, quantity: Number(e.target.value) } : null)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
               </div>
@@ -133,7 +133,7 @@ export default function HistoryPage() {
                 className="w-full flex justify-between items-center p-4">
                 <div className="text-left">
                   <div className="font-bold text-sm">{receipt.store}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{dayjs(receipt.date).format("M月D日")} ／ {receipt.storeType}</div>
+                  <div className="text-xs text-gray-600 mt-0.5">{dayjs(receipt.date).format("M月D日")} ／ {receipt.storeType}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="font-bold text-rose-400 text-lg">¥{receipt.total.toLocaleString()}</div>
@@ -151,7 +151,7 @@ export default function HistoryPage() {
                           {item.name}
                           {(item.quantity || 1) > 1 && <span className="text-rose-400 font-bold ml-1">×{item.quantity}</span>}
                         </div>
-                        <div className="text-xs text-gray-400">{item.category}</div>
+                        <div className="text-xs text-gray-600">{item.category}</div>
                       </div>
                       {item.wasteTags?.length > 0 && (
                         <span className="text-xs bg-rose-100 text-rose-400 px-2 py-0.5 rounded-full">{item.wasteTags[0]}</span>
@@ -166,15 +166,6 @@ export default function HistoryPage() {
         )}
       </div>
 
-      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 pb-[env(safe-area-inset-bottom,0px)]">
-        <div className="flex">
-          <button onClick={() => router.push("/")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">🏠</span>ホーム</button>
-          <button onClick={() => router.push("/history")} className="flex-1 py-3 flex flex-col items-center text-xs text-rose-400"><span className="text-lg">📅</span>履歴</button>
-          <button onClick={() => router.push("/scan")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><div className="-mt-4 w-12 h-12 bg-gradient-to-r from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg">+</div></button>
-          <button onClick={() => router.push("/analysis")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">📊</span>分析</button>
-          <button onClick={() => router.push("/settings")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">⚙️</span>設定</button>
-        </div>
-      </div>
     </div>
   );
 }
