@@ -25,17 +25,17 @@ export default function AnalysisPage() {
   }));
 
   // 店頻度ランキング
-  const storeCount = {};
+  const storeCount: Record<string, number> = {};
   receipts.forEach(r => { storeCount[r.store] = (storeCount[r.store] || 0) + 1; });
   const storeCountRank = Object.entries(storeCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
   // 店金額ランキング
-  const storeAmount = {};
+  const storeAmount: Record<string, number> = {};
   receipts.forEach(r => { storeAmount[r.store] = (storeAmount[r.store] || 0) + r.total; });
   const storeAmountRank = Object.entries(storeAmount).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
   // 商品ランキング
-  const itemCount = {};
+  const itemCount: Record<string, number> = {};
   receipts.forEach(r => r.items.forEach((item: Item) => {
     itemCount[item.name] = (itemCount[item.name] || 0) + 1;
   }));
