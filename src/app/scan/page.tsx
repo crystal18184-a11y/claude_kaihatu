@@ -45,43 +45,49 @@ export default function ScanPage() {
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [categoryModal, setCategoryModal] = useState<number | null>(null);
 
-  const fixOrientation = (dataUrl: string): Promise<string> => new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
-    img.onload = () => {
-      try {
-        const arr = dataUrl.split(",")[1];
-        const binary = atob(arr);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-        let orientation = 1;
-        const view = new DataView(bytes.buffer);
-        if (view.getUint16(0, false) === 0xFFD8) {
-          let offset = 2;
-          while (offset < bytes.length - 2) {
-            const marker = view.getUint16(offset, false);
-            offset += 2;
-            if (marker === 0xFFE1) {
-              if (view.getUint32(offset + 2, false) === 0x45786966) {
-                const little = view.getUint16(offset + 8, false) === 0x4949;
-                const tags = view.getUint16(offset + 14, little);
-                for (let i = 0; i < tags; i++) {
-                  if (view.getUint16(offset + 16 + i * 12, little) === 0x0112) {
-                    orientation = view.getUint16(offset + 16 + i * 12 + 8, little);
-                    break;
-                  }
+  const fixOrientation = (file: File): Promise<string> => new Promise(async (resolve, reject) => {
+    // EXIF の orientation だけ先頭 64KB から読む（画像全体を展開しない）
+    let orientation = 1;
+    try {
+      const chunk = await file.slice(0, 65536).arrayBuffer();
+      const bytes = new Uint8Array(chunk);
+      const view = new DataView(bytes.buffer);
+      if (view.getUint16(0, false) === 0xFFD8) {
+        let offset = 2;
+        while (offset < bytes.length - 2) {
+          const marker = view.getUint16(offset, false);
+          offset += 2;
+          if (marker === 0xFFE1) {
+            if (view.getUint32(offset + 2, false) === 0x45786966) {
+              const little = view.getUint16(offset + 8, false) === 0x4949;
+              const tags = view.getUint16(offset + 14, little);
+              for (let i = 0; i < tags; i++) {
+                if (view.getUint16(offset + 16 + i * 12, little) === 0x0112) {
+                  orientation = view.getUint16(offset + 16 + i * 12 + 8, little);
+                  break;
                 }
               }
-              break;
             }
-            const segLen = view.getUint16(offset, false);
-            if (segLen < 2) break;
-            offset += segLen;
+            break;
           }
+          const segLen = view.getUint16(offset, false);
+          if (segLen < 2) break;
+          offset += segLen;
         }
+      }
+    } catch {
+      // EXIF 解析失敗時は orientation 1 のまま続行
+    }
+
+    // Image の src に ObjectURL を使い、大きな base64 文字列をメモリに展開しない
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("画像の読み込みに失敗しました")); };
+    img.onload = () => {
+      try {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        if (!ctx) { reject(new Error("Canvas 2D context unavailable")); return; }
+        if (!ctx) { URL.revokeObjectURL(objectUrl); reject(new Error("Canvas 2D context unavailable")); return; }
         const MAX = 1200;
         let w = img.width, h = img.height;
         const ratio = Math.min(MAX / w, MAX / h, 1);
@@ -100,12 +106,14 @@ export default function ScanPage() {
         }
         ctx.drawImage(img, 0, 0, w, h);
         ctx.restore();
+        URL.revokeObjectURL(objectUrl);
         resolve(canvas.toDataURL("image/jpeg", 0.85));
       } catch (e) {
+        URL.revokeObjectURL(objectUrl);
         reject(e instanceof Error ? e : new Error("画像処理エラー"));
       }
     };
-    img.src = dataUrl;
+    img.src = objectUrl;
   });
 
   const handleFile = async (file: File) => {
@@ -114,14 +122,8 @@ export default function ScanPage() {
     setPhase("loading");
     setProgress(10);
     try {
-      const dataUrl = await new Promise<string>((res, rej) => {
-        const reader = new FileReader();
-        reader.onload = () => res(reader.result as string);
-        reader.onerror = () => rej(new Error("読み込み失敗"));
-        reader.readAsDataURL(file);
-      });
       setProgress(30);
-      const compressed = await fixOrientation(dataUrl);
+      const compressed = await fixOrientation(file);
       setProgress(50);
       const base64 = compressed.slice(compressed.indexOf(",") + 1);
       const res = await fetch("/api/scan-receipt", {
