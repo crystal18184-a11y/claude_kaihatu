@@ -50,7 +50,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-rose-50 max-w-md mx-auto pb-24">
+    <div className="min-h-dvh bg-rose-50 w-full max-w-md mx-auto pb-28">
       {categoryModal && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setCategoryModal(false)} />
@@ -180,7 +180,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100">
+      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 pb-[env(safe-area-inset-bottom,0px)]">
         <div className="flex">
           <button onClick={() => router.push("/")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">🏠</span>ホーム</button>
           <button onClick={() => router.push("/history")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">📅</span>履歴</button>

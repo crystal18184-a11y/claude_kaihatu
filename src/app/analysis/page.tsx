@@ -45,7 +45,7 @@ export default function AnalysisPage() {
   const alerts = Object.entries(itemCount).filter(([, count]) => count >= 3).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div className="min-h-screen bg-rose-50 max-w-md mx-auto pb-24">
+    <div className="min-h-dvh bg-rose-50 w-full max-w-md mx-auto pb-28">
       <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
         <div className="text-xs opacity-80 tracking-widest">MY KAKEIBO</div>
         <div className="text-2xl font-bold">分析</div>
@@ -132,7 +132,7 @@ export default function AnalysisPage() {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-100">
+      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 pb-[env(safe-area-inset-bottom,0px)]">
         <div className="flex">
           <button onClick={() => router.push("/")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">🏠</span>ホーム</button>
           <button onClick={() => router.push("/history")} className="flex-1 py-3 flex flex-col items-center text-xs text-gray-400"><span className="text-lg">📅</span>履歴</button>

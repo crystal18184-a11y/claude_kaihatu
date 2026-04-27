@@ -54,7 +54,7 @@ export default function ManualPage() {
   };
 
   return (
-    <div className="min-h-screen bg-rose-50 max-w-md mx-auto pb-24">
+    <div className="min-h-dvh bg-rose-50 w-full max-w-md mx-auto pb-28">
       {categoryModal !== null && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setCategoryModal(null)} />
