@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { useStore } from "@/store/useStore";
+import type { Item } from "@/types";
 
 const MAJOR_EMOJI = {"食費":"🛒","日用品・生活":"🏠","ファッション":"👗","電化製品・家電":"📱","子ども・教育":"🎒","娯楽・その他":"🎡"};
 const MAJOR_COLOR = {"食費":"#e8657a","日用品・生活":"#4a9fd4","ファッション":"#d45fa0","電化製品・家電":"#7b61d4","子ども・教育":"#f0a500","娯楽・その他":"#ff7043"};
@@ -18,7 +19,7 @@ export default function AnalysisPage() {
 
   // カテゴリ別集計
   const majorTotals = {};
-  receipts.forEach(r => r.items.forEach(item => {
+  receipts.forEach(r => r.items.forEach((item: Item) => {
     const cat = item.majorCategory || "娯楽・その他";
     majorTotals[cat] = (majorTotals[cat] || 0) + item.price;
   }));
@@ -35,7 +36,7 @@ export default function AnalysisPage() {
 
   // 商品ランキング
   const itemCount = {};
-  receipts.forEach(r => r.items.forEach(item => {
+  receipts.forEach(r => r.items.forEach((item: Item) => {
     itemCount[item.name] = (itemCount[item.name] || 0) + 1;
   }));
   const itemRank = Object.entries(itemCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
