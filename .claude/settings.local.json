@@ -9,7 +9,15 @@
       "Bash(git checkout *)",
       "Bash(git commit *)",
       "Bash(git add *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git rm *)",
+      "Bash(curl -s -X POST http://localhost:3000/api/scan-receipt -H 'Content-Type: application/json' -d '{\"imageBase64\":\"dGVzdA==\",\"mediaType\":\"image/jpeg\"}')",
+      "Bash(node *)",
+      "Bash(echo \"\")",
+      "Bash(echo \"## 禁止事項\")",
+      "Bash(echo \"- .env.local は読み取り禁止\")",
+      "Bash(echo \"- APIキーを含むファイルは絶対に読まない\")",
+      "Bash(vercel --version)"
     ]
   }
 }
