@@ -37,25 +37,37 @@ input, select, textarea {
 
 /* ─── Page transition animations ─── */
 
+/* scale + translate gives perception of depth (iOS-like layering) */
 @keyframes slide-from-right {
-  from { opacity: 0; transform: translateX(28px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateX(0)    scale(1);    }
 }
 @keyframes slide-from-left {
-  from { opacity: 0; transform: translateX(-28px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(-20px) scale(0.98); }
+  to   { opacity: 1; transform: translateX(0)     scale(1);    }
 }
 @keyframes fade-in-page {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(8px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
 }
-@keyframes sheet-up {
+/* sheet slides from below — heavy-mass feel via Apple's deceleration curve */
+@keyframes sheet-enter {
   from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+  to   { transform: translateY(0);    }
+}
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* backwards: from-state applied before start, no fill after end (avoids transform containing-block side effect) */
-.page-forward  { animation: slide-from-right 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) backwards; }
-.page-backward { animation: slide-from-left  0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94) backwards; }
-.page-fade     { animation: fade-in-page     0.22s ease-out backwards; }
-.sheet-up      { animation: sheet-up         0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+/*
+ * expo-out approximation: fast start → long, gentle deceleration at rest
+ * cubic-bezier(0.22,1,0.36,1) ≈ iOS critically-damped spring
+ * backwards fill: from-state applied pre-start so no flash; transform gone after
+ */
+.page-forward  { animation: slide-from-right 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.page-backward { animation: slide-from-left  0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.page-fade     { animation: fade-in-page     0.28s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+/* Apple UISheetPresentationController easing (0.32, 0.72, 0, 1) */
+.sheet-up      { animation: sheet-enter      0.38s cubic-bezier(0.32, 0.72, 0, 1) backwards; }
+.overlay-in    { animation: overlay-in       0.28s ease-out backwards; }

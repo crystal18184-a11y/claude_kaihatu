@@ -132,8 +132,8 @@ export default function HistoryPage() {
               <button onClick={() => setExpandedId(expandedId === receipt.id ? null : receipt.id)}
                 className="w-full flex justify-between items-center p-4">
                 <div className="text-left">
-                  <div className="font-bold text-sm">{receipt.store}</div>
-                  <div className="text-xs text-gray-600 mt-0.5">{dayjs(receipt.date).format("M月D日")} ／ {receipt.storeType}</div>
+                  <div className="font-bold text-sm text-gray-900">{receipt.store}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{dayjs(receipt.date).format("M月D日")} ／ {receipt.storeType}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="font-bold text-rose-400 text-lg">¥{receipt.total.toLocaleString()}</div>
@@ -147,16 +147,16 @@ export default function HistoryPage() {
                       className="w-full flex items-center gap-2 py-2 border-t border-gray-50 text-left">
                       <span className="text-lg">{EMOJI[item.category] ?? "📦"}</span>
                       <div className="flex-1">
-                        <div className="text-sm font-medium">
+                        <div className="text-sm font-semibold text-gray-800">
                           {item.name}
                           {(item.quantity || 1) > 1 && <span className="text-rose-400 font-bold ml-1">×{item.quantity}</span>}
                         </div>
-                        <div className="text-xs text-gray-600">{item.category}</div>
+                        <div className="text-xs text-gray-500">{item.category}</div>
                       </div>
                       {item.wasteTags?.length > 0 && (
                         <span className="text-xs bg-rose-100 text-rose-400 px-2 py-0.5 rounded-full">{item.wasteTags[0]}</span>
                       )}
-                      <span className="text-sm font-bold text-gray-600">¥{((item.price || 0) * (item.quantity || 1)).toLocaleString()}</span>
+                      <span className="text-sm font-bold text-gray-800">¥{((item.price || 0) * (item.quantity || 1)).toLocaleString()}</span>
                     </button>
                   ))}
                 </div>

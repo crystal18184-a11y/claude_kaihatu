@@ -280,7 +280,7 @@ export default function ScanPage() {
                 <input type="text" value={editStore} onChange={(e) => setEditStore(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
                 {similarStores.length > 0 && (
                   <div className="mt-2">
-                    <div className="text-xs text-gray-400 mb-1">過去に登録した店舗：</div>
+                    <div className="text-xs text-gray-600 mb-1">過去に登録した店舗：</div>
                     <div className="flex flex-wrap gap-2">
                       {similarStores.map((s) => (
                         <button key={s.name} onClick={() => setEditStore(s.name)} className="text-xs bg-rose-50 text-rose-400 border border-rose-200 px-3 py-1 rounded-full">{s.name}</button>
@@ -309,12 +309,12 @@ export default function ScanPage() {
                       </div>
                       <div className="flex gap-2 ml-12">
                         <div className="flex-1">
-                          <label className="text-xs text-gray-400 mb-0.5 block">単価</label>
+                          <label className="text-xs text-gray-600 mb-0.5 block">単価</label>
                           <input type="number" value={item.price} onChange={(e) => updateItem(i, { price: Number(e.target.value) })}
                             className="w-full border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-rose-400" />
                         </div>
                         <div className="flex-1">
-                          <label className="text-xs text-gray-400 mb-0.5 block">個数</label>
+                          <label className="text-xs text-gray-600 mb-0.5 block">個数</label>
                           <input type="number" value={item.quantity || 1} onChange={(e) => updateItem(i, { quantity: Number(e.target.value) })}
                             className="w-full border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-rose-400" />
                         </div>
@@ -334,7 +334,7 @@ export default function ScanPage() {
                         </div>
                         <div className="text-xs text-gray-600">{item.category}</div>
                       </div>
-                      <div className="font-bold text-sm text-gray-600 flex-shrink-0">
+                      <div className="font-bold text-sm text-gray-800 flex-shrink-0">
                         ¥{((item.price || 0) * (item.quantity || 1)).toLocaleString()}
                       </div>
                     </div>

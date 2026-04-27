@@ -66,7 +66,7 @@ export default function AnalysisPage() {
           <>
             {/* カテゴリ別グラフ */}
             <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-              <div className="font-bold text-gray-700 mb-3">🛒 カテゴリ別支出</div>
+              <div className="font-bold text-gray-800 mb-3">🛒 カテゴリ別支出</div>
               {Object.entries(majorTotals).sort((a, b) => b[1] - a[1]).map(([cat, amt]) => (
                 <div key={cat} className="mb-3">
                   <div className="flex justify-between mb-1">
@@ -83,7 +83,7 @@ export default function AnalysisPage() {
             {/* 買いすぎアラート */}
             {alerts.length > 0 && (
               <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-                <div className="font-bold text-gray-700 mb-3">⚠️ 買いすぎアラート</div>
+                <div className="font-bold text-gray-800 mb-3">⚠️ 買いすぎアラート</div>
                 {alerts.map(([name, count]) => (
                   <div key={name} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                     <span className="text-sm text-gray-600">{name}</span>
@@ -95,22 +95,22 @@ export default function AnalysisPage() {
 
             {/* 店頻度ランキング */}
             <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-              <div className="font-bold text-gray-700 mb-3">🏪 よく行ったお店</div>
+              <div className="font-bold text-gray-800 mb-3">🏪 よく行ったお店</div>
               {storeCountRank.map(([store, count], i) => (
                 <div key={store} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
-                  <span className="text-lg font-bold text-rose-300">{i + 1}</span>
+                  <span className="text-lg font-bold text-rose-400">{i + 1}</span>
                   <span className="flex-1 text-sm">{store}</span>
-                  <span className="text-sm font-bold text-gray-600">{count}回</span>
+                  <span className="text-sm font-bold text-gray-700">{count}回</span>
                 </div>
               ))}
             </div>
 
             {/* 店金額ランキング */}
             <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-              <div className="font-bold text-gray-700 mb-3">💰 お金を使ったお店</div>
+              <div className="font-bold text-gray-800 mb-3">💰 お金を使ったお店</div>
               {storeAmountRank.map(([store, amt], i) => (
                 <div key={store} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
-                  <span className="text-lg font-bold text-rose-300">{i + 1}</span>
+                  <span className="text-lg font-bold text-rose-400">{i + 1}</span>
                   <span className="flex-1 text-sm">{store}</span>
                   <span className="text-sm font-bold text-rose-400">¥{amt.toLocaleString()}</span>
                 </div>
@@ -119,12 +119,12 @@ export default function AnalysisPage() {
 
             {/* 商品ランキング */}
             <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-              <div className="font-bold text-gray-700 mb-3">🛍️ よく買ったもの</div>
+              <div className="font-bold text-gray-800 mb-3">🛍️ よく買ったもの</div>
               {itemRank.map(([name, count], i) => (
                 <div key={name} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
-                  <span className="text-lg font-bold text-rose-300">{i + 1}</span>
+                  <span className="text-lg font-bold text-rose-400">{i + 1}</span>
                   <span className="flex-1 text-sm">{name}</span>
-                  <span className="text-sm font-bold text-gray-600">{count}回</span>
+                  <span className="text-sm font-bold text-gray-700">{count}回</span>
                 </div>
               ))}
             </div>

@@ -55,7 +55,7 @@ export default function SettingsPage() {
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setCategoryModal(false)} />
           <div className="relative bg-white rounded-t-3xl w-full max-w-md p-4 pb-8 max-h-96 overflow-y-auto">
-            <div className="font-bold text-gray-700 mb-3 text-center">カテゴリを選択</div>
+            <div className="font-bold text-gray-800 mb-3 text-center">カテゴリを選択</div>
             <div className="grid grid-cols-3 gap-2">
               {ALL_CATS.map((cat) => (
                 <button key={cat} onClick={() => { setNewFixed(prev => ({ ...prev, category: cat })); setCategoryModal(false); }}
@@ -76,7 +76,7 @@ export default function SettingsPage() {
       <div className="p-4">
         {/* 予算設定 */}
         <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-          <div className="font-bold text-gray-700 mb-4">💰 今月の予算</div>
+          <div className="font-bold text-gray-800 mb-4">💰 今月の予算</div>
           <div className="flex gap-2 mb-3">
             <input type="number" value={budgetInput} onChange={(e) => setBudgetInput(Number(e.target.value))}
               className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
@@ -106,8 +106,8 @@ export default function SettingsPage() {
             <div key={f.id} className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0">
               <span className="text-2xl">{EMOJI[f.category] ?? "💳"}</span>
               <div className="flex-1">
-                <div className="font-bold text-sm">{f.name}</div>
-                <div className="text-xs text-gray-600">毎月{f.dayOfMonth}日 ¥{f.amount.toLocaleString()}</div>
+                <div className="font-bold text-sm text-gray-900">{f.name}</div>
+                <div className="text-xs text-gray-500">毎月{f.dayOfMonth}日 ¥{f.amount.toLocaleString()}</div>
               </div>
               <button onClick={() => updateFixedCost(f.id, { enabled: !f.enabled })}
                 className={`text-xs px-2 py-1 rounded-lg font-bold ${f.enabled ? "bg-rose-100 text-rose-400" : "bg-gray-100 text-gray-400"}`}>
@@ -168,7 +168,7 @@ export default function SettingsPage() {
 
         {/* データ管理 */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="font-bold text-gray-700 mb-3">🗂️ データ管理</div>
+          <div className="font-bold text-gray-800 mb-3">🗂️ データ管理</div>
           <button onClick={() => {
             if (confirm("全てのデータを削除しますか？この操作は取り消せません。")) {
               localStorage.removeItem("kakeibo-storage");

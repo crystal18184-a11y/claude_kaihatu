@@ -27,7 +27,7 @@ export default function BottomNav({ activeTab }: { activeTab: number }) {
           className="fixed inset-0 z-50 flex items-end justify-center"
           onClick={() => setShowSheet(false)}
         >
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="overlay-in absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
           <div
             className="sheet-up relative z-10 bg-white rounded-t-3xl w-full max-w-md px-5 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]"
             onClick={(e) => e.stopPropagation()}

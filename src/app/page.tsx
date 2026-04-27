@@ -94,7 +94,7 @@ export default function Home() {
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setCategoryModal(false)} />
           <div className="relative bg-white rounded-t-3xl w-full max-w-md p-4 pb-8 max-h-96 overflow-y-auto">
-            <div className="font-bold text-gray-700 mb-3 text-center">カテゴリを選択</div>
+            <div className="font-bold text-gray-800 mb-3 text-center">カテゴリを選択</div>
             <div className="grid grid-cols-3 gap-2">
               {ALL_CATS.map((cat) => (
                 <button key={cat}
@@ -223,8 +223,8 @@ export default function Home() {
                     <>
                       <div className="flex justify-between items-center p-4 border-b border-rose-50">
                         <div>
-                          <div className="font-bold text-sm">{receipt.store}</div>
-                          <div className="text-xs text-gray-600">{receipt.storeType}</div>
+                          <div className="font-bold text-sm text-gray-900">{receipt.store}</div>
+                          <div className="text-xs text-gray-500">{receipt.storeType}</div>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="font-bold text-rose-400 text-lg">¥{receipt.total.toLocaleString()}</div>
@@ -237,12 +237,12 @@ export default function Home() {
                           <button key={i} onClick={() => startEditItem(receipt.id, item)}
                             className="w-full flex items-center gap-2 py-1 border-b border-gray-50 last:border-0 text-left">
                             <span>{EMOJI[item.category] ?? "📦"}</span>
-                            <span className="flex-1 text-xs text-gray-600">
+                            <span className="flex-1 text-xs text-gray-800">
                               {item.name}
                               {(item.quantity || 1) > 1 && <span className="text-rose-400 font-bold ml-1">×{item.quantity}</span>}
                             </span>
                             {item.wasteTags?.length > 0 && <span className="text-xs bg-rose-100 text-rose-400 px-2 py-0.5 rounded-full">{item.wasteTags[0]}</span>}
-                            <span className="text-xs font-bold text-gray-600">¥{((item.price || 0) * (item.quantity || 1)).toLocaleString()}</span>
+                            <span className="text-xs font-bold text-gray-800">¥{((item.price || 0) * (item.quantity || 1)).toLocaleString()}</span>
                           </button>
                         ))}
                         {receipt.items.length > 3 && (
