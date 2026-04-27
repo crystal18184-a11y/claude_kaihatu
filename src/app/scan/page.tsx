@@ -45,59 +45,65 @@ export default function ScanPage() {
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [categoryModal, setCategoryModal] = useState<number | null>(null);
 
-  const fixOrientation = (dataUrl: string): Promise<string> => new Promise((resolve) => {
+  const fixOrientation = (dataUrl: string): Promise<string> => new Promise((resolve, reject) => {
     const img = new Image();
+    img.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
     img.onload = () => {
-      const arr = dataUrl.split(",")[1];
-      const binary = atob(arr);
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      let orientation = 1;
-      const view = new DataView(bytes.buffer);
-      if (view.getUint16(0, false) === 0xFFD8) {
-        let offset = 2;
-        while (offset < bytes.length - 2) {
-          const marker = view.getUint16(offset, false);
-          offset += 2;
-          if (marker === 0xFFE1) {
-            if (view.getUint32(offset + 2, false) === 0x45786966) {
-              const little = view.getUint16(offset + 8, false) === 0x4949;
-              const tags = view.getUint16(offset + 14, little);
-              for (let i = 0; i < tags; i++) {
-                if (view.getUint16(offset + 16 + i * 12, little) === 0x0112) {
-                  orientation = view.getUint16(offset + 16 + i * 12 + 8, little);
-                  break;
+      try {
+        const arr = dataUrl.split(",")[1];
+        const binary = atob(arr);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        let orientation = 1;
+        const view = new DataView(bytes.buffer);
+        if (view.getUint16(0, false) === 0xFFD8) {
+          let offset = 2;
+          while (offset < bytes.length - 2) {
+            const marker = view.getUint16(offset, false);
+            offset += 2;
+            if (marker === 0xFFE1) {
+              if (view.getUint32(offset + 2, false) === 0x45786966) {
+                const little = view.getUint16(offset + 8, false) === 0x4949;
+                const tags = view.getUint16(offset + 14, little);
+                for (let i = 0; i < tags; i++) {
+                  if (view.getUint16(offset + 16 + i * 12, little) === 0x0112) {
+                    orientation = view.getUint16(offset + 16 + i * 12 + 8, little);
+                    break;
+                  }
                 }
               }
+              break;
             }
-            break;
+            const segLen = view.getUint16(offset, false);
+            if (segLen < 2) break;
+            offset += segLen;
           }
-          const segLen = view.getUint16(offset, false);
-          if (segLen < 2) break;
-          offset += segLen;
         }
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { reject(new Error("Canvas 2D context unavailable")); return; }
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        const ratio = Math.min(MAX / w, MAX / h, 1);
+        w = Math.round(w * ratio); h = Math.round(h * ratio);
+        if ([5,6,7,8].includes(orientation)) { canvas.width = h; canvas.height = w; }
+        else { canvas.width = w; canvas.height = h; }
+        ctx.save();
+        switch(orientation) {
+          case 2: ctx.transform(-1,0,0,1,canvas.width,0); break;
+          case 3: ctx.transform(-1,0,0,-1,canvas.width,canvas.height); break;
+          case 4: ctx.transform(1,0,0,-1,0,canvas.height); break;
+          case 5: ctx.transform(0,1,1,0,0,0); break;
+          case 6: ctx.transform(0,1,-1,0,canvas.height,0); break;
+          case 7: ctx.transform(0,-1,-1,0,canvas.height,canvas.width); break;
+          case 8: ctx.transform(0,-1,1,0,0,canvas.width); break;
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        ctx.restore();
+        resolve(canvas.toDataURL("image/jpeg", 0.85));
+      } catch (e) {
+        reject(e instanceof Error ? e : new Error("画像処理エラー"));
       }
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d")!;
-      const MAX = 1200;
-      let w = img.width, h = img.height;
-      const ratio = Math.min(MAX / w, MAX / h, 1);
-      w = Math.round(w * ratio); h = Math.round(h * ratio);
-      if ([5,6,7,8].includes(orientation)) { canvas.width = h; canvas.height = w; }
-      else { canvas.width = w; canvas.height = h; }
-      ctx.save();
-      switch(orientation) {
-        case 2: ctx.transform(-1,0,0,1,canvas.width,0); break;
-        case 3: ctx.transform(-1,0,0,-1,canvas.width,canvas.height); break;
-        case 4: ctx.transform(1,0,0,-1,0,canvas.height); break;
-        case 5: ctx.transform(0,1,1,0,0,0); break;
-        case 6: ctx.transform(0,1,-1,0,canvas.height,0); break;
-        case 7: ctx.transform(0,-1,-1,0,canvas.height,canvas.width); break;
-        case 8: ctx.transform(0,-1,1,0,0,canvas.width); break;
-      }
-      ctx.drawImage(img, 0, 0, w, h);
-      ctx.restore();
-      resolve(canvas.toDataURL("image/jpeg", 0.85));
     };
     img.src = dataUrl;
   });
