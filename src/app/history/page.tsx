@@ -47,7 +47,7 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-rose-50 w-full max-w-md mx-auto pb-28">
+    <div className="min-h-dvh bg-[#FAF7F8] w-full max-w-md mx-auto pb-28">
       {/* カテゴリモーダル */}
       {categoryModal && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center">

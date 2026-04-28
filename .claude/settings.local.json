@@ -18,7 +18,8 @@
       "Bash(echo \"- .env.local は読み取り禁止\")",
       "Bash(echo \"- APIキーを含むファイルは絶対に読まない\")",
       "Bash(vercel --version)",
-      "Bash(npm audit *)"
+      "Bash(npm audit *)",
+      "Bash(npm install *)"
     ]
   }
 }

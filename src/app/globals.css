@@ -1,15 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAF7F8;
+  --foreground: #1F2937;
+  --app-accent-pink: #F65F8B;
+  --app-muted: #9CA3AF;
 
-  /* Theme color variables — defaults to teal, overridden by ThemeApplier on client */
-  --c-from:   #2dd4bf;
-  --c-to:     #14b8a6;
-  --c-accent: #14b8a6;
-  --c-light:  #f0fdfa;
-  --c-mid:    #99f6e4;
+  /* Theme color variables — defaults to teal (#20C7B5), overridden by ThemeApplier on client */
+  --c-from:   #34D9C5;
+  --c-to:     #20C7B5;
+  --c-accent: #20C7B5;
+  --c-light:  #E8FAF7;
+  --c-mid:    #9EEDE2;
 }
 
 /* ─── Theme utility classes ─── */

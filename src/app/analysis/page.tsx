@@ -45,7 +45,7 @@ export default function AnalysisPage() {
   const alerts = Object.entries(itemCount).filter(([, count]) => count >= 3).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div className="min-h-dvh bg-rose-50 w-full max-w-md mx-auto pb-28">
+    <div className="min-h-dvh bg-[#FAF7F8] w-full max-w-md mx-auto pb-28">
       <div className="theme-grad p-5 text-white">
         <div className="text-xs tracking-widest text-white/90">MY KAKEIBO</div>
         <div className="text-2xl font-bold">分析</div>
