@@ -3,7 +3,22 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Theme color variables — defaults to teal, overridden by ThemeApplier on client */
+  --c-from:   #2dd4bf;
+  --c-to:     #14b8a6;
+  --c-accent: #14b8a6;
+  --c-light:  #f0fdfa;
+  --c-mid:    #99f6e4;
 }
+
+/* ─── Theme utility classes ─── */
+.theme-grad       { background: linear-gradient(135deg, var(--c-from), var(--c-to)); }
+.theme-solid      { background-color: var(--c-accent); }
+.theme-text       { color: var(--c-accent); }
+.theme-bg-light   { background-color: var(--c-light); }
+.theme-border     { border-color: var(--c-accent); }
+.theme-shadow     { box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--c-accent) 35%, transparent); }
 
 @theme inline {
   --color-background: var(--background);

@@ -76,7 +76,7 @@ export default function ManualPage() {
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
+      <div className="theme-grad p-5 text-white">
         <button onClick={() => { setDirection("backward"); router.back(); }} className="text-white text-sm mb-2 opacity-80">← 戻る</button>
         <div className="text-xl font-bold">手動で入力</div>
       </div>
@@ -150,7 +150,7 @@ export default function ManualPage() {
         </div>
 
         <button onClick={handleSave}
-          className="w-full py-4 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-2xl font-bold text-lg shadow-lg">
+          className="w-full py-4 theme-grad text-white rounded-2xl font-bold text-lg shadow-lg">
           💾 記録する
         </button>
       </div>

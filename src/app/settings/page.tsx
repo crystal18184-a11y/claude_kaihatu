@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { useStore } from "@/store/useStore";
+import { useThemeStore, THEMES, THEME_KEYS } from "@/store/themeStore";
 import type { MajorCategory } from "@/types";
 
 const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・麺類":"🍚","調味料・油":"🧂","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","外食・テイクアウト":"🍱","外食・ドリンク":"🥤","外食・デザート":"🍰","レジャー・観光フード":"🎡","交通・外出":"🚃","趣味・娯楽":"🎮","サブスク・定額サービス":"📺","家賃・住宅費":"🏠","水道・光熱費":"💡","通信費":"📶","保険料":"🛡️","その他固定費":"💳","その他":"📦"};
@@ -14,6 +15,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const { getBudgetForMonth, setBudget, fixedCosts, addFixedCost, updateFixedCost, deleteFixedCost, applyFixedCostsForMonth } = useStore();
+  const { theme: currentTheme, setTheme } = useThemeStore();
 
   const yearMonth = dayjs().format("YYYY-MM");
   const currentBudget = getBudgetForMonth(yearMonth);
@@ -68,7 +70,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
+      <div className="theme-grad p-5 text-white">
         <div className="text-xs opacity-80 tracking-widest">MY KAKEIBO</div>
         <div className="text-2xl font-bold">設定</div>
       </div>
@@ -83,9 +85,36 @@ export default function SettingsPage() {
             <span className="flex items-center text-sm text-gray-600">円</span>
           </div>
           <button onClick={handleSaveBudget}
-            className="w-full py-3 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-xl font-bold shadow-sm">
+            className="w-full py-3 theme-grad text-white rounded-xl font-bold shadow-sm">
             {saved ? "✅ 保存しました！" : "保存する"}
           </button>
+        </div>
+
+        {/* テーマカラー */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
+          <div className="font-bold text-gray-800 mb-4">🎨 テーマカラー</div>
+          <div className="grid grid-cols-4 gap-3">
+            {THEME_KEYS.map((key) => {
+              const t = THEMES[key];
+              const isActive = currentTheme === key;
+              return (
+                <button key={key} onClick={() => setTheme(key)}
+                  className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform">
+                  <div
+                    className={`w-14 h-14 rounded-2xl shadow-sm relative ${isActive ? "ring-4 ring-offset-2 ring-gray-400 scale-105" : ""} transition-all`}
+                    style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }}
+                  >
+                    {isActive && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white text-xl font-bold drop-shadow">✓</span>
+                      </div>
+                    )}
+                  </div>
+                  <span className={`text-xs font-medium ${isActive ? "text-gray-800" : "text-gray-500"}`}>{t.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* 固定費・サブスク */}
@@ -155,7 +184,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex gap-2">
                 <button onClick={() => setShowAddFixed(false)} className="flex-1 py-2 bg-white rounded-xl font-bold text-gray-600 text-sm">キャンセル</button>
-                <button onClick={handleAddFixed} className="flex-1 py-2 bg-rose-400 rounded-xl font-bold text-white text-sm">追加</button>
+                <button onClick={handleAddFixed} className="flex-1 py-2 theme-solid rounded-xl font-bold text-white text-sm">追加</button>
               </div>
             </div>
           ) : (

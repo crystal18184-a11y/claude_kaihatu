@@ -199,7 +199,7 @@ export default function ScanPage() {
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
+      <div className="theme-grad p-5 text-white">
         <button onClick={() => { setDirection("backward"); router.push("/"); }} className="text-white text-sm mb-2 opacity-80">← 戻る</button>
         <div className="text-xl font-bold">レシートを追加</div>
       </div>
@@ -345,7 +345,7 @@ export default function ScanPage() {
 
             <div className="p-4 flex gap-3">
               <button onClick={reset} className="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-600">やり直す</button>
-              <button onClick={handleSave} className="flex-1 py-3 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-xl font-bold shadow-lg">💾 記録する</button>
+              <button onClick={handleSave} className="flex-1 py-3 theme-grad text-white rounded-xl font-bold shadow-lg">💾 記録する</button>
             </div>
           </div>
         )}

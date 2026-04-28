@@ -144,13 +144,13 @@ export default function Home() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => setEditingItem(null)} className="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-600">キャンセル</button>
-              <button onClick={saveEditItem} className="flex-1 py-3 bg-rose-400 rounded-xl font-bold text-white">保存</button>
+              <button onClick={saveEditItem} className="flex-1 py-3 theme-solid rounded-xl font-bold text-white">保存</button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
+      <div className="theme-grad p-5 text-white">
         <div className="text-xs opacity-80 tracking-widest">MY KAKEIBO</div>
         <div className="text-2xl font-bold">おうち家計簿</div>
         <div className="flex items-center justify-between mt-3">
@@ -183,9 +183,9 @@ export default function Home() {
               const hasReceipt = dayTotal > 0;
               return (
                 <button key={i} onClick={() => setSelectedDate(isSelected ? null : date)}
-                  className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs text-gray-700 transition-all ${isSelected ? "bg-rose-400 text-white" : ""} ${isToday && !isSelected ? "border-2 border-rose-400 text-rose-500 font-bold" : ""} ${hasReceipt && !isSelected ? "bg-rose-50" : ""}`}>
+                  className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs text-gray-700 transition-all ${isSelected ? "theme-solid text-white" : ""} ${isToday && !isSelected ? "border-2 theme-border font-bold theme-text" : ""} ${hasReceipt && !isSelected ? "theme-bg-light" : ""}`}>
                   <span className={hasReceipt ? "font-bold" : ""}>{day}</span>
-                  {hasReceipt && <span className={`text-xs ${isSelected ? "text-white" : "text-rose-400"}`}>¥{(dayTotal/1000).toFixed(0)}k</span>}
+                  {hasReceipt && <span className={`text-xs ${isSelected ? "text-white" : "theme-text"}`}>¥{(dayTotal/1000).toFixed(0)}k</span>}
                 </button>
               );
             })}
@@ -216,7 +216,7 @@ export default function Home() {
                       </div>
                       <div className="flex gap-2">
                         <button onClick={() => setEditingReceipt(null)} className="flex-1 py-2 bg-gray-100 rounded-xl text-sm font-bold text-gray-600">キャンセル</button>
-                        <button onClick={saveEditReceipt} className="flex-1 py-2 bg-rose-400 rounded-xl text-sm font-bold text-white">保存</button>
+                        <button onClick={saveEditReceipt} className="flex-1 py-2 theme-solid rounded-xl text-sm font-bold text-white">保存</button>
                       </div>
                     </div>
                   ) : (

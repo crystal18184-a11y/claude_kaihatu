@@ -46,7 +46,7 @@ export default function AnalysisPage() {
 
   return (
     <div className="min-h-dvh bg-rose-50 w-full max-w-md mx-auto pb-28">
-      <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
+      <div className="theme-grad p-5 text-white">
         <div className="text-xs tracking-widest text-white/90">MY KAKEIBO</div>
         <div className="text-2xl font-bold">分析</div>
         <div className="flex items-center justify-between mt-3">

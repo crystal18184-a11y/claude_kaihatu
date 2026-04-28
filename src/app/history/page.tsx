@@ -100,13 +100,13 @@ export default function HistoryPage() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => setEditingItem(null)} className="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-600">キャンセル</button>
-              <button onClick={saveEditItem} className="flex-1 py-3 bg-rose-400 rounded-xl font-bold text-white">保存</button>
+              <button onClick={saveEditItem} className="flex-1 py-3 theme-solid rounded-xl font-bold text-white">保存</button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
+      <div className="theme-grad p-5 text-white">
         <div className="text-xs opacity-80 tracking-widest">MY KAKEIBO</div>
         <div className="text-2xl font-bold">買い物履歴</div>
         <div className="flex items-center justify-between mt-3">

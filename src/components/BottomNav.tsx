@@ -38,7 +38,7 @@ export default function BottomNav({ activeTab }: { activeTab: number }) {
               onClick={() => goToDetail("/scan")}
               className="w-full flex items-center gap-4 p-4 bg-rose-50 rounded-2xl mb-3 text-left active:scale-[0.98] transition-transform"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
+              <div className="w-12 h-12 theme-grad rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
                 📷
               </div>
               <div>
@@ -72,13 +72,13 @@ export default function BottomNav({ activeTab }: { activeTab: number }) {
         <div className="flex max-w-md mx-auto">
           <button
             onClick={() => goTo(0, "/")}
-            className={`flex-1 py-3 flex flex-col items-center text-xs font-medium ${activeTab === 0 ? "text-rose-400" : "text-gray-400"}`}
+            className={`flex-1 py-3 flex flex-col items-center text-xs font-medium ${activeTab === 0 ? "theme-text" : "text-gray-400"}`}
           >
             <span className="text-lg mb-0.5">🏠</span>ホーム
           </button>
           <button
             onClick={() => goTo(1, "/history")}
-            className={`flex-1 py-3 flex flex-col items-center text-xs font-medium ${activeTab === 1 ? "text-rose-400" : "text-gray-400"}`}
+            className={`flex-1 py-3 flex flex-col items-center text-xs font-medium ${activeTab === 1 ? "theme-text" : "text-gray-400"}`}
           >
             <span className="text-lg mb-0.5">📅</span>履歴
           </button>
@@ -86,19 +86,19 @@ export default function BottomNav({ activeTab }: { activeTab: number }) {
             onClick={() => setShowSheet(true)}
             className="flex-1 py-2 flex flex-col items-center"
           >
-            <div className="-mt-5 w-14 h-14 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white text-3xl shadow-lg shadow-rose-300/50 active:scale-95 transition-transform">
+            <div className="-mt-5 w-14 h-14 theme-grad rounded-full flex items-center justify-center text-white text-3xl shadow-lg shadow-rose-300/50 active:scale-95 transition-transform">
               +
             </div>
           </button>
           <button
             onClick={() => goTo(3, "/analysis")}
-            className={`flex-1 py-3 flex flex-col items-center text-xs font-medium ${activeTab === 3 ? "text-rose-400" : "text-gray-400"}`}
+            className={`flex-1 py-3 flex flex-col items-center text-xs font-medium ${activeTab === 3 ? "theme-text" : "text-gray-400"}`}
           >
             <span className="text-lg mb-0.5">📊</span>分析
           </button>
           <button
             onClick={() => goTo(4, "/settings")}
-            className={`flex-1 py-3 flex flex-col items-center text-xs font-medium ${activeTab === 4 ? "text-rose-400" : "text-gray-400"}`}
+            className={`flex-1 py-3 flex flex-col items-center text-xs font-medium ${activeTab === 4 ? "theme-text" : "text-gray-400"}`}
           >
             <span className="text-lg mb-0.5">⚙️</span>設定
           </button>
