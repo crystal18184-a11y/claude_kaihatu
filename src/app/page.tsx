@@ -116,10 +116,10 @@ export default function Home() {
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setEditingItem(null)} />
           <div
-            className="absolute bottom-0 inset-x-0 mx-auto max-w-md bg-white rounded-t-3xl z-10 overflow-y-auto"
-            style={{ maxHeight: "92vh" }}
+            className="absolute bottom-0 inset-x-0 mx-auto max-w-md bg-white rounded-t-3xl z-10"
+            style={{ height: "min(500px, 85vh)" }}
           >
-            <div className="px-4 pt-4 pb-2">
+            <div className="absolute inset-0 overflow-y-auto px-4 pt-4" style={{ paddingBottom: "120px" }}>
               <div className="font-bold text-gray-800 mb-4 text-center">商品を編集</div>
               <div className="mb-3">
                 <label className="text-xs text-gray-700 font-semibold mb-1 block">商品名</label>
@@ -147,7 +147,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="sticky bottom-0 bg-white border-t border-gray-100 px-4 pt-3 pb-8">
+            <div className="absolute bottom-0 inset-x-0 bg-white rounded-b-3xl border-t border-gray-100 px-4 pt-3 pb-6">
               <div className="flex gap-2">
                 <button onClick={() => setEditingItem(null)} className="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-600">キャンセル</button>
                 <button onClick={saveEditItem} className="flex-1 py-3 theme-solid rounded-xl font-bold text-white">保存</button>
