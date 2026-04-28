@@ -47,7 +47,7 @@ export default function AnalysisPage() {
   return (
     <div className="min-h-dvh bg-rose-50 w-full max-w-md mx-auto pb-28">
       <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-5 text-white">
-        <div className="text-xs opacity-80 tracking-widest">MY KAKEIBO</div>
+        <div className="text-xs tracking-widest text-white/90">MY KAKEIBO</div>
         <div className="text-2xl font-bold">分析</div>
         <div className="flex items-center justify-between mt-3">
           <button onClick={() => setCurrentMonth(currentMonth.subtract(1, "month"))} className="text-white text-2xl px-2">&#8249;</button>
@@ -58,7 +58,7 @@ export default function AnalysisPage() {
 
       <div className="p-4">
         {receipts.length === 0 ? (
-          <div className="text-center text-gray-400 py-12">
+          <div className="text-center text-gray-500 py-12">
             <div className="text-4xl mb-3">📊</div>
             <div>この月の記録はありません</div>
           </div>
@@ -70,8 +70,8 @@ export default function AnalysisPage() {
               {Object.entries(majorTotals).sort((a, b) => b[1] - a[1]).map(([cat, amt]) => (
                 <div key={cat} className="mb-3">
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm">{MAJOR_EMOJI[cat] || "📦"} {cat}</span>
-                    <span className="text-sm font-bold">¥{amt.toLocaleString()}</span>
+                    <span className="text-sm text-gray-800">{MAJOR_EMOJI[cat] || "📦"} {cat}</span>
+                    <span className="text-sm font-bold text-gray-900">¥{amt.toLocaleString()}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full">
                     <div className="h-2 rounded-full" style={{ width: `${(amt/totalSpent)*100}%`, background: MAJOR_COLOR[cat] || "#9e9e9e" }} />
@@ -86,7 +86,7 @@ export default function AnalysisPage() {
                 <div className="font-bold text-gray-800 mb-3">⚠️ 買いすぎアラート</div>
                 {alerts.map(([name, count]) => (
                   <div key={name} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                    <span className="text-sm text-gray-600">{name}</span>
+                    <span className="text-sm text-gray-800">{name}</span>
                     <span className="text-sm font-bold text-rose-400">今月{count}回</span>
                   </div>
                 ))}
@@ -99,7 +99,7 @@ export default function AnalysisPage() {
               {storeCountRank.map(([store, count], i) => (
                 <div key={store} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
                   <span className="text-lg font-bold text-rose-400">{i + 1}</span>
-                  <span className="flex-1 text-sm">{store}</span>
+                  <span className="flex-1 text-sm text-gray-800">{store}</span>
                   <span className="text-sm font-bold text-gray-700">{count}回</span>
                 </div>
               ))}
@@ -111,7 +111,7 @@ export default function AnalysisPage() {
               {storeAmountRank.map(([store, amt], i) => (
                 <div key={store} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
                   <span className="text-lg font-bold text-rose-400">{i + 1}</span>
-                  <span className="flex-1 text-sm">{store}</span>
+                  <span className="flex-1 text-sm text-gray-800">{store}</span>
                   <span className="text-sm font-bold text-rose-400">¥{amt.toLocaleString()}</span>
                 </div>
               ))}
@@ -123,7 +123,7 @@ export default function AnalysisPage() {
               {itemRank.map(([name, count], i) => (
                 <div key={name} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
                   <span className="text-lg font-bold text-rose-400">{i + 1}</span>
-                  <span className="flex-1 text-sm">{name}</span>
+                  <span className="flex-1 text-sm text-gray-800">{name}</span>
                   <span className="text-sm font-bold text-gray-700">{count}回</span>
                 </div>
               ))}
