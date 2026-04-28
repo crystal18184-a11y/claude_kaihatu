@@ -5,8 +5,8 @@ import { useStore } from "@/store/useStore";
 import { useNavStore } from "@/store/navStore";
 import type { Item, MajorCategory, Category } from "@/types";
 
-const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・麺類":"🍚","調味料・油":"🧂","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","外食・テイクアウト":"🍱","外食・ドリンク":"🥤","外食・デザート":"🍰","レジャー・観光フード":"🎡","交通・外出":"🚃","趣味・娯楽":"🎮","サブスク・定額サービス":"📺","家賃・住宅費":"🏠","水道・光熱費":"💡","通信費":"📶","保険料":"🛡️","その他固定費":"💳","その他":"📦"};
-const MAJOR_MAP: Record<string, string> = {"肉類":"食費","魚介類":"食費","卵":"食費","乳製品":"食費","野菜":"食費","果物":"食費","きのこ":"食費","海藻・乾物":"食費","豆腐・大豆製品":"食費","漬物・発酵食品":"食費","パン":"食費","米・麺類":"食費","調味料・油":"食費","飲み物":"食費","お菓子・スナック":"食費","アイス・冷菓":"食費","冷凍食品":"食費","レトルト・缶詰":"食費","日用品":"日用品・生活","医療・薬":"日用品・生活","化粧品・美容":"日用品・生活","衣服・靴":"ファッション","バッグ・アクセサリー":"ファッション","家電":"電化製品・家電","スマホ・PC・ガジェット":"電化製品・家電","子ども用品":"子ども・教育","文具・おもちゃ":"子ども・教育","習い事・教育費":"子ども・教育","外食・テイクアウト":"外食・グルメ","外食・ドリンク":"外食・グルメ","外食・デザート":"外食・グルメ","レジャー・観光フード":"外食・グルメ","交通・外出":"娯楽・その他","趣味・娯楽":"娯楽・その他","サブスク・定額サービス":"固定費・サブスク","家賃・住宅費":"固定費・サブスク","水道・光熱費":"固定費・サブスク","通信費":"固定費・サブスク","保険料":"固定費・サブスク","その他固定費":"固定費・サブスク","その他":"娯楽・その他"};
+const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・穀物":"🍚","麺類":"🍜","調味料":"🧂","油・ドレッシング":"🫙","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","食事・テイクアウト（外食）":"🍱","食事（外食）":"🍽️","ドリンク（外食）":"🥤","アルコール（外食）":"🍺","デザート（外食）":"🍰","飲み会・居酒屋":"🍻","交通・外出":"🚃","趣味・娯楽":"🎮","サブスク・定額サービス":"📺","家賃・住宅費":"🏠","水道・光熱費":"💡","通信費":"📶","保険料":"🛡️","その他固定費":"💳","その他":"📦"};
+const MAJOR_MAP: Record<string, string> = {"肉類":"食費","魚介類":"食費","卵":"食費","乳製品":"食費","野菜":"食費","果物":"食費","きのこ":"食費","海藻・乾物":"食費","豆腐・大豆製品":"食費","漬物・発酵食品":"食費","パン":"食費","米・穀物":"食費","麺類":"食費","調味料":"食費","油・ドレッシング":"食費","飲み物":"食費","お菓子・スナック":"食費","アイス・冷菓":"食費","冷凍食品":"食費","レトルト・缶詰":"食費","日用品":"日用品・生活","医療・薬":"日用品・生活","化粧品・美容":"日用品・生活","衣服・靴":"ファッション","バッグ・アクセサリー":"ファッション","家電":"電化製品・家電","スマホ・PC・ガジェット":"電化製品・家電","子ども用品":"子ども・教育","文具・おもちゃ":"子ども・教育","習い事・教育費":"子ども・教育","食事・テイクアウト（外食）":"外食・グルメ","食事（外食）":"外食・グルメ","ドリンク（外食）":"外食・グルメ","アルコール（外食）":"外食・グルメ","デザート（外食）":"外食・グルメ","飲み会・居酒屋":"外食・グルメ","交通・外出":"娯楽・その他","趣味・娯楽":"娯楽・その他","サブスク・定額サービス":"固定費・サブスク","家賃・住宅費":"固定費・サブスク","水道・光熱費":"固定費・サブスク","通信費":"固定費・サブスク","保険料":"固定費・サブスク","その他固定費":"固定費・サブスク","その他":"娯楽・その他"};
 const ALL_CATS = Object.keys(EMOJI);
 const STORE_TYPES = ["スーパー","コンビニ","ドラッグストア","カフェ","レストラン","ファッション","家電量販店","テーマパーク","サブスク","公共料金","その他"];
 
@@ -84,19 +84,19 @@ export default function ManualPage() {
       <div className="p-4">
         <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
           <div className="mb-3">
-            <label className="text-xs text-gray-600 font-semibold mb-1 block">日付</label>
+            <label className="text-xs text-gray-700 font-semibold mb-1 block">日付</label>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
           </div>
           <div className="mb-3">
-            <label className="text-xs text-gray-600 font-semibold mb-1 block">店名・サービス名</label>
+            <label className="text-xs text-gray-700 font-semibold mb-1 block">店名・サービス名</label>
             <input type="text" value={store} onChange={(e) => setStore(e.target.value)} placeholder="例：Netflix、東京電力"
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
           </div>
           <div>
-            <label className="text-xs text-gray-600 font-semibold mb-1 block">店の種類</label>
+            <label className="text-xs text-gray-700 font-semibold mb-1 block">店の種類</label>
             <select value={storeType} onChange={(e) => setStoreType(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400">
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400">
               {STORE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
@@ -104,7 +104,7 @@ export default function ManualPage() {
 
         <div className="mb-3">
           <div className="flex justify-between items-center mb-2">
-            <div className="font-bold text-gray-600 text-sm">商品・内容</div>
+            <div className="font-bold text-gray-800 text-sm">商品・内容</div>
             <div className="text-sm font-bold text-rose-400">合計 ¥{total.toLocaleString()}</div>
           </div>
 
@@ -117,24 +117,24 @@ export default function ManualPage() {
                 </button>
                 <input type="text" value={item.name} onChange={(e) => updateItem(i, { name: e.target.value })}
                   placeholder="商品名・内容"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-rose-400" />
+                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
                 {items.length > 1 && (
                   <button onClick={() => removeItem(i)} className="text-red-300 text-lg flex-shrink-0">✕</button>
                 )}
               </div>
               <div className="flex gap-2 ml-12">
                 <div className="flex-1">
-                  <label className="text-xs text-gray-600 mb-0.5 block">単価</label>
+                  <label className="text-xs text-gray-700 font-medium mb-0.5 block">単価</label>
                   <input type="number" value={item.price} onChange={(e) => updateItem(i, { price: Number(e.target.value) })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:border-rose-400" />
+                    className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:border-rose-400" />
                 </div>
                 <div className="flex-1">
-                  <label className="text-xs text-gray-600 mb-0.5 block">個数</label>
+                  <label className="text-xs text-gray-700 font-medium mb-0.5 block">個数</label>
                   <input type="number" value={item.quantity} onChange={(e) => updateItem(i, { quantity: Number(e.target.value) })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:border-rose-400" />
+                    className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:border-rose-400" />
                 </div>
                 <div className="flex-1">
-                  <label className="text-xs text-gray-600 mb-0.5 block">小計</label>
+                  <label className="text-xs text-gray-700 font-medium mb-0.5 block">小計</label>
                   <div className="px-3 py-1.5 text-sm font-bold text-rose-400">
                     ¥{(item.price * item.quantity).toLocaleString()}
                   </div>
