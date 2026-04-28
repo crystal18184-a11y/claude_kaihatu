@@ -5,8 +5,8 @@ import dayjs from "dayjs";
 import { useStore } from "@/store/useStore";
 import type { Item } from "@/types";
 
-const MAJOR_EMOJI: Record<string, string> = {"食費":"🛒","日用品・生活":"🏠","ファッション":"👗","電化製品・家電":"📱","子ども・教育":"🎒","娯楽・その他":"🎡"};
-const MAJOR_COLOR: Record<string, string> = {"食費":"#e8657a","日用品・生活":"#4a9fd4","ファッション":"#d45fa0","電化製品・家電":"#7b61d4","子ども・教育":"#f0a500","娯楽・その他":"#ff7043"};
+const MAJOR_EMOJI: Record<string, string> = {"食費":"🛒","日用品・生活":"🏠","ファッション":"👗","電化製品・家電":"📱","子ども・教育":"🎒","外食・グルメ":"🍽️","娯楽・その他":"🎡"};
+const MAJOR_COLOR: Record<string, string> = {"食費":"#e8657a","日用品・生活":"#4a9fd4","ファッション":"#d45fa0","電化製品・家電":"#7b61d4","子ども・教育":"#f0a500","外食・グルメ":"#f59e0b","娯楽・その他":"#ff7043"};
 
 export default function AnalysisPage() {
   const router = useRouter();
