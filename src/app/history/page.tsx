@@ -1,9 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useMemo } from "react";
 import dayjs from "dayjs";
+import { Search, ChevronRight, ChevronDown, Trash2 } from "lucide-react";
 import { useStore } from "@/store/useStore";
-import type { Item } from "@/types";
+import { formatYen } from "@/lib/format";
+import { MAJOR_CATEGORY_EMOJI } from "@/types";
+import type { Item, MajorCategory } from "@/types";
+
+type SortKey = "date_desc" | "date_asc" | "amount_desc" | "amount_asc";
+const MAJOR_CATEGORIES: MajorCategory[] = ["食費","日用品・生活","ファッション","電化製品・家電","子ども・教育","外食・グルメ","娯楽・その他","固定費・サブスク"];
 
 const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・穀物":"🍚","麺類":"🍜","調味料":"🧂","油・ドレッシング":"🫙","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","食事・テイクアウト（外食）":"🍱","食事（外食）":"🍽️","ドリンク（外食）":"🥤","アルコール（外食）":"🍺","デザート（外食）":"🍰","飲み会・居酒屋":"🍻","交通・外出":"🚃","趣味・娯楽":"🎮","その他":"📦"};
 const MAJOR_MAP: Record<string, string> = {"肉類":"食費","魚介類":"食費","卵":"食費","乳製品":"食費","野菜":"食費","果物":"食費","きのこ":"食費","海藻・乾物":"食費","豆腐・大豆製品":"食費","漬物・発酵食品":"食費","パン":"食費","米・穀物":"食費","麺類":"食費","調味料":"食費","油・ドレッシング":"食費","飲み物":"食費","お菓子・スナック":"食費","アイス・冷菓":"食費","冷凍食品":"食費","レトルト・缶詰":"食費","日用品":"日用品・生活","医療・薬":"日用品・生活","化粧品・美容":"日用品・生活","衣服・靴":"ファッション","バッグ・アクセサリー":"ファッション","家電":"電化製品・家電","スマホ・PC・ガジェット":"電化製品・家電","子ども用品":"子ども・教育","文具・おもちゃ":"子ども・教育","習い事・教育費":"子ども・教育","食事・テイクアウト（外食）":"外食・グルメ","食事（外食）":"外食・グルメ","ドリンク（外食）":"外食・グルメ","アルコール（外食）":"外食・グルメ","デザート（外食）":"外食・グルメ","飲み会・居酒屋":"外食・グルメ","交通・外出":"娯楽・その他","趣味・娯楽":"娯楽・その他","その他":"娯楽・その他"};
@@ -18,21 +23,62 @@ interface EditingItem {
   category: string;
 }
 
+function dominantMajor(items: Item[]): MajorCategory {
+  if (items.length === 0) return "娯楽・その他";
+  const counts = new Map<MajorCategory, number>();
+  for (const it of items) {
+    const m = (it.majorCategory ?? "娯楽・その他") as MajorCategory;
+    counts.set(m, (counts.get(m) ?? 0) + 1);
+  }
+  let best: MajorCategory = "娯楽・その他";
+  let max = 0;
+  for (const [k, v] of counts.entries()) {
+    if (v > max) { max = v; best = k; }
+  }
+  return best;
+}
+
 export default function HistoryPage() {
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null);
   const [categoryModal, setCategoryModal] = useState<boolean>(false);
+  const [search, setSearch] = useState("");
+  const [filterMajor, setFilterMajor] = useState<MajorCategory | "all">("all");
+  const [sort, setSort] = useState<SortKey>("date_desc");
   const { getReceiptsForMonth, updateItem, deleteReceipt } = useStore();
 
   useEffect(() => { setMounted(true); }, []);
-  if (!mounted) return null;
 
   const yearMonth = currentMonth.format("YYYY-MM");
-  const receipts = getReceiptsForMonth(yearMonth);
-  const totalSpent = receipts.reduce((sum, r) => sum + r.total, 0);
+  const allReceipts = getReceiptsForMonth(yearMonth);
+
+  const visibleReceipts = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return allReceipts
+      .filter((r) => {
+        if (q && !r.store.toLowerCase().includes(q)) return false;
+        if (filterMajor !== "all") {
+          const major = dominantMajor(r.items as Item[]);
+          if (major !== filterMajor) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        switch (sort) {
+          case "date_asc": return a.date.localeCompare(b.date);
+          case "amount_desc": return b.total - a.total;
+          case "amount_asc": return a.total - b.total;
+          case "date_desc":
+          default: return b.date.localeCompare(a.date);
+        }
+      });
+  }, [allReceipts, search, filterMajor, sort]);
+
+  const totalSpent = allReceipts.reduce((sum, r) => sum + r.total, 0);
+
+  if (!mounted) return null;
 
   const saveEditItem = () => {
     if (!editingItem) return;
@@ -113,63 +159,111 @@ export default function HistoryPage() {
         </div>
       )}
 
-      <div className="theme-grad p-5 text-white">
-        <div className="text-xs opacity-80 tracking-widest">MY KAKEIBO</div>
-        <div className="text-2xl font-bold">買い物履歴</div>
-        <div className="flex items-center justify-between mt-3">
-          <button onClick={() => setCurrentMonth(currentMonth.subtract(1, "month"))} className="text-white text-2xl px-2">&#8249;</button>
-          <div className="font-bold text-lg">{currentMonth.format("YYYY年M月")}</div>
-          <button onClick={() => setCurrentMonth(currentMonth.add(1, "month"))} className="text-white text-2xl px-2">&#8250;</button>
+      <div className="theme-grad px-5 pt-4 pb-5 text-white">
+        <div className="flex items-center justify-between">
+          <div className="text-[10px] opacity-80 tracking-[0.2em] font-medium">MY KAKEIBO</div>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setCurrentMonth(currentMonth.subtract(1, "month"))} className="text-white/90 text-xl px-2 active:scale-90 transition-transform">&#8249;</button>
+            <div className="font-bold text-sm tabular-nums">{currentMonth.format("YYYY年M月")}</div>
+            <button onClick={() => setCurrentMonth(currentMonth.add(1, "month"))} className="text-white/90 text-xl px-2 active:scale-90 transition-transform">&#8250;</button>
+          </div>
         </div>
-        <div className="mt-3 bg-white/20 rounded-2xl p-3 flex justify-between items-center">
-          <span className="text-sm opacity-80">{receipts.length}件の買い物</span>
-          <span className="font-bold text-xl">¥{totalSpent.toLocaleString()}</span>
+        <div className="mt-2 flex items-baseline justify-between">
+          <div className="text-xl font-bold tabular-nums">買い物履歴</div>
+          <div className="text-[11px] opacity-90">{allReceipts.length}件 / 合計 <span className="font-bold tabular-nums">{formatYen(totalSpent)}</span></div>
         </div>
       </div>
 
-      <div className="p-4">
-        {receipts.length === 0 ? (
-          <div className="text-center text-gray-400 py-12">
-            <div className="text-4xl mb-3">📋</div>
-            <div>この月の記録はありません</div>
+      <div className="px-5 pt-4">
+        {/* Search + Filter + Sort */}
+        <div className="bg-white rounded-3xl p-3 shadow-sm mb-4">
+          <div className="relative mb-2">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="店名で検索"
+              className="w-full pl-9 pr-3 py-2 bg-gray-50 rounded-2xl text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:bg-white focus:ring-1 focus:ring-gray-200"
+            />
           </div>
+          <div className="flex gap-2">
+            <select value={filterMajor} onChange={(e) => setFilterMajor(e.target.value as MajorCategory | "all")}
+              className="flex-1 px-3 py-2 bg-gray-50 rounded-2xl text-xs text-gray-800 focus:outline-none border-0">
+              <option value="all">すべてのカテゴリ</option>
+              {MAJOR_CATEGORIES.map((m) => (
+                <option key={m} value={m}>{MAJOR_CATEGORY_EMOJI[m] ?? "📦"} {m}</option>
+              ))}
+            </select>
+            <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}
+              className="flex-1 px-3 py-2 bg-gray-50 rounded-2xl text-xs text-gray-800 focus:outline-none border-0">
+              <option value="date_desc">新しい順</option>
+              <option value="date_asc">古い順</option>
+              <option value="amount_desc">金額が高い順</option>
+              <option value="amount_asc">金額が低い順</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Receipt list */}
+        {allReceipts.length === 0 ? (
+          <div className="text-center text-gray-500 py-12">
+            <div className="text-3xl mb-3">📋</div>
+            <div className="text-sm">この月の記録はありません</div>
+          </div>
+        ) : visibleReceipts.length === 0 ? (
+          <div className="text-center text-gray-500 py-10 text-sm">条件に一致する記録がありません</div>
         ) : (
-          [...receipts].sort((a, b) => b.date.localeCompare(a.date)).map((receipt) => (
-            <div key={receipt.id} className="bg-white rounded-2xl mb-3 overflow-hidden shadow-sm">
-              <button onClick={() => setExpandedId(expandedId === receipt.id ? null : receipt.id)}
-                className="w-full flex justify-between items-center p-4">
-                <div className="text-left">
-                  <div className="font-bold text-sm text-gray-900">{receipt.store}</div>
-                  <div className="text-xs text-gray-600 mt-0.5">{dayjs(receipt.date).format("M月D日")} ／ {receipt.storeType}</div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="font-bold text-rose-400 text-lg">¥{receipt.total.toLocaleString()}</div>
-                  <span className="text-gray-500">{expandedId === receipt.id ? "▲" : "▼"}</span>
-                </div>
-              </button>
-              {expandedId === receipt.id && (
-                <div className="px-3 pb-3">
-                  {receipt.items.map((item: Item, i: number) => (
-                    <button key={i} onClick={() => setEditingItem({ receiptId: receipt.id, itemId: item.id, name: item.name, price: item.price, quantity: item.quantity || 1, category: item.category })}
-                      className="w-full flex items-center gap-2 py-2 border-t border-gray-50 text-left">
-                      <span className="text-lg">{EMOJI[item.category] ?? "📦"}</span>
-                      <div className="flex-1">
-                        <div className="text-sm font-semibold text-gray-800">
-                          {item.name}
-                          {(item.quantity || 1) > 1 && <span className="text-rose-400 font-bold ml-1">×{item.quantity}</span>}
+          visibleReceipts.map((receipt) => {
+            const major = dominantMajor(receipt.items as Item[]);
+            const isExpanded = expandedId === receipt.id;
+            return (
+              <div key={receipt.id} className="bg-white rounded-2xl mb-2 overflow-hidden shadow-sm">
+                <button onClick={() => setExpandedId(isExpanded ? null : receipt.id)}
+                  className="w-full flex justify-between items-center px-4 py-3 active:bg-gray-50 transition-colors">
+                  <div className="text-left min-w-0 flex-1">
+                    <div className="font-bold text-sm text-gray-900 truncate">{receipt.store}</div>
+                    <div className="text-[11px] text-gray-600 mt-0.5">
+                      <span className="tabular-nums">{dayjs(receipt.date).format("M/D")}</span>
+                      <span className="mx-1.5 text-gray-300">／</span>
+                      <span>{MAJOR_CATEGORY_EMOJI[major] ?? "📦"} {major}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="font-bold text-gray-900 tabular-nums">{formatYen(receipt.total)}</span>
+                    {isExpanded
+                      ? <ChevronDown className="w-4 h-4 text-gray-400" />
+                      : <ChevronRight className="w-4 h-4 text-gray-400" />}
+                  </div>
+                </button>
+                {isExpanded && (
+                  <div className="px-3 pb-3 border-t border-gray-50">
+                    {receipt.items.map((item: Item, i: number) => (
+                      <button key={i} onClick={() => setEditingItem({ receiptId: receipt.id, itemId: item.id, name: item.name, price: item.price, quantity: item.quantity || 1, category: item.category })}
+                        className="w-full flex items-center gap-2 py-2 border-b border-gray-50 last:border-0 text-left">
+                        <span className="text-base">{EMOJI[item.category] ?? "📦"}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-gray-800 truncate">
+                            {item.name}
+                            {(item.quantity || 1) > 1 && <span className="theme-text font-bold ml-1">×{item.quantity}</span>}
+                          </div>
+                          <div className="text-[11px] text-gray-600">{item.category}</div>
                         </div>
-                        <div className="text-xs text-gray-600">{item.category}</div>
-                      </div>
-                      {item.wasteTags?.length > 0 && (
-                        <span className="text-xs bg-rose-100 text-rose-400 px-2 py-0.5 rounded-full">{item.wasteTags[0]}</span>
-                      )}
-                      <span className="text-sm font-bold text-gray-800">¥{((item.price || 0) * (item.quantity || 1)).toLocaleString()}</span>
+                        {item.wasteTags?.length > 0 && (
+                          <span className="text-[10px] bg-[#FEE7EE] text-[#F65F8B] px-2 py-0.5 rounded-full">{item.wasteTags[0]}</span>
+                        )}
+                        <span className="text-sm font-bold text-gray-900 tabular-nums">{formatYen((item.price || 0) * (item.quantity || 1))}</span>
+                      </button>
+                    ))}
+                    <button onClick={() => { if (confirm("このレシートを削除しますか？")) { deleteReceipt(receipt.id); setExpandedId(null); } }}
+                      className="w-full mt-2 py-2 flex items-center justify-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" /> このレシートを削除
                     </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
 
