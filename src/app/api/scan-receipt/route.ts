@@ -1,14 +1,44 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import type { Item } from "@/types";
+import { checkOrigin, validateScanInput, getClientIp } from "@/lib/security";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 export async function POST(req: NextRequest) {
+  const originError = checkOrigin(req);
+  if (originError) {
+    return NextResponse.json(
+      { success: false, error: originError.message },
+      { status: originError.status }
+    );
+  }
+
+  const ip = getClientIp(req);
+  const rate = checkRateLimit(ip);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { success: false, error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(rate.retryAfterSec) } }
+    );
+  }
+
   try {
-    const { imageBase64, mediaType } = await req.json();
+    const body = await req.json();
+    const inputError = validateScanInput(body);
+    if (inputError) {
+      return NextResponse.json(
+        { success: false, error: inputError.message },
+        { status: inputError.status }
+      );
+    }
+    const { imageBase64, mediaType } = body as {
+      imageBase64: string;
+      mediaType: "image/jpeg" | "image/png" | "image/webp";
+    };
 
     const response = await client.messages.create({
       model: "claude-haiku-4-5",
