@@ -2,8 +2,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
+import { Camera, ChevronRight } from "lucide-react";
 import { useStore } from "@/store/useStore";
-import type { Item, Category, MajorCategory } from "@/types";
+import { useNavStore } from "@/store/navStore";
+import { formatYen, formatYenCompact } from "@/lib/format";
+import type { Item, MajorCategory } from "@/types";
 
 const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・穀物":"🍚","麺類":"🍜","調味料":"🧂","油・ドレッシング":"🫙","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","食事・テイクアウト（外食）":"🍱","食事（外食）":"🍽️","ドリンク（外食）":"🥤","アルコール（外食）":"🍺","デザート（外食）":"🍰","飲み会・居酒屋":"🍻","交通・外出":"🚃","趣味・娯楽":"🎮","その他":"📦"};
 const MAJOR_MAP: Record<string, string> = {"肉類":"食費","魚介類":"食費","卵":"食費","乳製品":"食費","野菜":"食費","果物":"食費","きのこ":"食費","海藻・乾物":"食費","豆腐・大豆製品":"食費","漬物・発酵食品":"食費","パン":"食費","米・穀物":"食費","麺類":"食費","調味料":"食費","油・ドレッシング":"食費","飲み物":"食費","お菓子・スナック":"食費","アイス・冷菓":"食費","冷凍食品":"食費","レトルト・缶詰":"食費","日用品":"日用品・生活","医療・薬":"日用品・生活","化粧品・美容":"日用品・生活","衣服・靴":"ファッション","バッグ・アクセサリー":"ファッション","家電":"電化製品・家電","スマホ・PC・ガジェット":"電化製品・家電","子ども用品":"子ども・教育","文具・おもちゃ":"子ども・教育","習い事・教育費":"子ども・教育","食事・テイクアウト（外食）":"外食・グルメ","食事（外食）":"外食・グルメ","ドリンク（外食）":"外食・グルメ","アルコール（外食）":"外食・グルメ","デザート（外食）":"外食・グルメ","飲み会・居酒屋":"外食・グルメ","交通・外出":"娯楽・その他","趣味・娯楽":"娯楽・その他","その他":"娯楽・その他"};
@@ -32,6 +35,7 @@ export default function Home() {
   const [categoryModal, setCategoryModal] = useState<boolean>(false);
 
   const { getReceiptsForMonth, getReceiptsForDate, getBudgetForMonth, deleteReceipt, updateReceipt, updateItem } = useStore();
+  const setDirection = useNavStore((s) => s.setDirection);
 
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
@@ -40,12 +44,28 @@ export default function Home() {
   const monthReceipts = getReceiptsForMonth(yearMonth);
   const budget = getBudgetForMonth(yearMonth);
   const totalSpent = monthReceipts.reduce((sum, r) => sum + r.total, 0);
+  const remaining = Math.max(budget - totalSpent, 0);
   const budgetPercent = Math.min((totalSpent / budget) * 100, 100);
   const selectedReceipts = selectedDate ? getReceiptsForDate(selectedDate) : [];
 
   const startDay = currentMonth.startOf("month").day();
   const daysInMonth = currentMonth.endOf("month").date();
   const calendarDays = [...Array(startDay).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
+
+  const today = dayjs();
+  const isCurrentMonth = currentMonth.isSame(today, "month");
+  const todayStr = today.format("YYYY-MM-DD");
+  const todayTotal = isCurrentMonth ? getReceiptsForDate(todayStr).reduce((s, r) => s + r.total, 0) : 0;
+  const weekStart = today.startOf("week");
+  const weekTotal = isCurrentMonth
+    ? monthReceipts.filter((r) => dayjs(r.date).isAfter(weekStart.subtract(1, "day"))).reduce((s, r) => s + r.total, 0)
+    : 0;
+  const daysLeft = isCurrentMonth ? Math.max(daysInMonth - today.date() + 1, 1) : daysInMonth;
+  const dailyAllowance = Math.max(Math.floor(remaining / daysLeft), 0);
+
+  const recentReceipts = [...monthReceipts].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+
+  const goToScan = () => { setDirection("forward"); router.push("/scan"); };
 
   const getDayTotal = (day: number) => {
     const date = currentMonth.format(`YYYY-MM-${String(day).padStart(2, "0")}`);
@@ -157,28 +177,63 @@ export default function Home() {
         </div>
       )}
 
-      <div className="theme-grad p-5 text-white">
-        <div className="text-xs opacity-80 tracking-widest">MY KAKEIBO</div>
-        <div className="text-2xl font-bold">おうち家計簿</div>
-        <div className="flex items-center justify-between mt-3">
-          <button onClick={() => setCurrentMonth(currentMonth.subtract(1, "month"))} className="text-white text-2xl px-2">&#8249;</button>
-          <div className="font-bold text-lg">{currentMonth.format("YYYY年M月")}</div>
-          <button onClick={() => setCurrentMonth(currentMonth.add(1, "month"))} className="text-white text-2xl px-2">&#8250;</button>
-        </div>
-        <div className="mt-3 bg-white/20 rounded-2xl p-3">
-          <div className="flex justify-between text-sm mb-1">
-            <span>¥{totalSpent.toLocaleString()} 使用</span>
-            <span>予算 ¥{budget.toLocaleString()}</span>
+      <div className="theme-grad px-5 pt-4 pb-5 text-white">
+        <div className="flex items-center justify-between">
+          <div className="text-[10px] opacity-80 tracking-[0.2em] font-medium">MY KAKEIBO</div>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setCurrentMonth(currentMonth.subtract(1, "month"))} className="text-white/90 text-xl px-2 active:scale-90 transition-transform">&#8249;</button>
+            <div className="font-bold text-sm tabular-nums">{currentMonth.format("YYYY年M月")}</div>
+            <button onClick={() => setCurrentMonth(currentMonth.add(1, "month"))} className="text-white/90 text-xl px-2 active:scale-90 transition-transform">&#8250;</button>
           </div>
-          <div className="h-2 bg-white/30 rounded-full"><div className="h-2 bg-white rounded-full" style={{ width: `${budgetPercent}%` }} /></div>
-          <div className="text-right text-xs mt-1 opacity-80">残り ¥{(budget - totalSpent).toLocaleString()}</div>
+        </div>
+        <div className="mt-2.5">
+          <div className="flex items-baseline justify-between mb-1">
+            <div>
+              <span className="text-[11px] opacity-85">今月の支出</span>
+              <span className="ml-2 text-xl font-bold tabular-nums">{formatYen(totalSpent)}</span>
+            </div>
+            <span className="text-[11px] opacity-80 tabular-nums">予算 {formatYen(budget)}</span>
+          </div>
+          <div className="h-1.5 bg-white/25 rounded-full overflow-hidden">
+            <div className="h-full bg-white rounded-full transition-all" style={{ width: `${budgetPercent}%` }} />
+          </div>
+          <div className="mt-1.5 flex justify-between text-[11px]">
+            <span className="opacity-90">残り <span className="font-bold tabular-nums">{formatYen(remaining)}</span></span>
+            <span className="opacity-90">1日あたり <span className="font-bold tabular-nums">{formatYen(dailyAllowance)}</span></span>
+          </div>
         </div>
       </div>
 
-      <div className="p-4">
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
+      <div className="px-5 pt-4">
+        {/* Today / Week stats */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="bg-white rounded-3xl p-4 shadow-sm">
+            <div className="text-[11px] text-gray-500 font-medium mb-1">今日の支出</div>
+            <div className="text-lg font-bold text-gray-900 tabular-nums">{formatYen(todayTotal)}</div>
+          </div>
+          <div className="bg-white rounded-3xl p-4 shadow-sm">
+            <div className="text-[11px] text-gray-500 font-medium mb-1">今週の支出</div>
+            <div className="text-lg font-bold text-gray-900 tabular-nums">{formatYen(weekTotal)}</div>
+          </div>
+        </div>
+
+        {/* Receipt CTA */}
+        <button onClick={goToScan}
+          className="w-full bg-white rounded-3xl p-4 shadow-sm mb-4 flex items-center gap-4 active:scale-[0.99] transition-transform text-left">
+          <div className="w-12 h-12 theme-grad rounded-2xl flex items-center justify-center flex-shrink-0">
+            <Camera className="w-6 h-6 text-white" strokeWidth={2.2} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-gray-900 text-sm">レシートを撮るだけで自動登録</div>
+            <div className="text-[11px] text-gray-500 mt-0.5">店名・日付・金額を読み取ります</div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+        </button>
+
+        {/* Calendar */}
+        <div className="bg-white rounded-3xl p-4 shadow-sm">
           <div className="grid grid-cols-7 mb-2">
-            {["日","月","火","水","木","金","土"].map((d) => (<div key={d} className="text-center text-xs text-gray-500 font-bold">{d}</div>))}
+            {["日","月","火","水","木","金","土"].map((d) => (<div key={d} className="text-center text-[11px] text-gray-500 font-bold">{d}</div>))}
           </div>
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((day, i) => {
@@ -190,9 +245,9 @@ export default function Home() {
               const hasReceipt = dayTotal > 0;
               return (
                 <button key={i} onClick={() => setSelectedDate(isSelected ? null : date)}
-                  className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs text-gray-700 transition-all ${isSelected ? "theme-solid text-white" : ""} ${isToday && !isSelected ? "border-2 theme-border font-bold theme-text" : ""} ${hasReceipt && !isSelected ? "theme-bg-light" : ""}`}>
+                  className={`aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 text-xs text-gray-700 transition-all ${isSelected ? "theme-solid text-white" : ""} ${isToday && !isSelected ? "border-2 theme-border font-bold theme-text" : ""} ${hasReceipt && !isSelected ? "theme-bg-light" : ""}`}>
                   <span className={hasReceipt ? "font-bold" : ""}>{day}</span>
-                  {hasReceipt && <span className={`text-xs ${isSelected ? "text-white" : "theme-text"}`}>¥{(dayTotal/1000).toFixed(0)}k</span>}
+                  {hasReceipt && <span className={`text-[9px] tabular-nums leading-none ${isSelected ? "text-white" : "theme-text"}`}>{formatYenCompact(dayTotal)}</span>}
                 </button>
               );
             })}
@@ -266,10 +321,32 @@ export default function Home() {
           </div>
         )}
 
+        {!selectedDate && recentReceipts.length > 0 && (
+          <div className="mt-5">
+            <div className="flex items-center justify-between mb-2 px-1">
+              <div className="font-bold text-gray-900 text-sm">最近の記録</div>
+              <span className="text-[11px] text-gray-500">{monthReceipts.length}件</span>
+            </div>
+            {recentReceipts.map((receipt) => (
+              <button key={receipt.id} onClick={() => setSelectedDate(receipt.date)}
+                className="w-full bg-white rounded-2xl px-4 py-3 mb-2 shadow-sm flex items-center justify-between text-left active:scale-[0.99] transition-transform">
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-sm text-gray-900 truncate">{receipt.store}</div>
+                  <div className="text-[11px] text-gray-500 mt-0.5">{dayjs(receipt.date).format("M/D")} ／ {receipt.storeType}</div>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <span className="font-bold text-gray-900 tabular-nums">{formatYen(receipt.total)}</span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
         {monthReceipts.length === 0 && !selectedDate && (
-          <div className="text-center text-gray-400 py-12">
-            <div className="text-4xl mb-3">📸</div>
-            <div>レシートを撮影して記録を始めましょう</div>
+          <div className="text-center text-gray-500 py-10 mt-2">
+            <div className="text-3xl mb-3">📸</div>
+            <div className="text-sm">レシートを撮影して記録を始めましょう</div>
           </div>
         )}
       </div>
