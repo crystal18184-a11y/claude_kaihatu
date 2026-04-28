@@ -91,9 +91,9 @@ export default function Home() {
     <div className="min-h-dvh bg-rose-50 w-full max-w-md mx-auto pb-28">
       {/* カテゴリモーダル */}
       {categoryModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setCategoryModal(false)} />
-          <div className="relative bg-white rounded-t-3xl w-full max-w-md p-4 pb-8 max-h-96 overflow-y-auto">
+          <div className="relative z-10 bg-white rounded-t-3xl w-full max-w-md p-4 pb-8 max-h-96 overflow-y-auto">
             <div className="font-bold text-gray-800 mb-3 text-center">カテゴリを選択</div>
             <div className="grid grid-cols-3 gap-2">
               {ALL_CATS.map((cat) => (
