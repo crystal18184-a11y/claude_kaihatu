@@ -2,17 +2,26 @@
 
 :root {
   --background: #FAF7F8;
-  --foreground: #1F2937;
+  --foreground: #111827;
+  --app-text-sub: #6B7280;
+  --app-text-muted: #9CA3AF;
+  --app-divider: #E5E7EB;
   --app-accent-pink: #F65F8B;
-  --app-muted: #9CA3AF;
+  --app-error: #EF4444;
+  --app-warn: #F97316;
+  --app-success: #22C55E;
+  --app-shadow-card: 0 4px 16px 0 rgba(17, 24, 39, 0.08);
 
   /* Theme color variables — defaults to teal (#20C7B5), overridden by ThemeApplier on client */
   --c-from:   #34D9C5;
   --c-to:     #20C7B5;
   --c-accent: #20C7B5;
+  --c-accent-strong: #12AFA0;
   --c-light:  #E8FAF7;
   --c-mid:    #9EEDE2;
 }
+
+.shadow-card { box-shadow: var(--app-shadow-card); }
 
 /* ─── Theme utility classes ─── */
 .theme-grad       { background: linear-gradient(135deg, var(--c-from), var(--c-to)); }

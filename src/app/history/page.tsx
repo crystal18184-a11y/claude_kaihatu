@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { Search, ChevronRight, ChevronDown, Trash2 } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { formatYen } from "@/lib/format";
-import { MAJOR_CATEGORY_EMOJI } from "@/types";
+import { CategoryIcon, MajorCategoryIcon, getMajorColor } from "@/lib/categoryIcon";
 import type { Item, MajorCategory } from "@/types";
 
 type SortKey = "date_desc" | "date_asc" | "amount_desc" | "amount_asc";
@@ -99,15 +99,19 @@ export default function HistoryPage() {
         <div className="fixed inset-0 z-[60] flex items-end justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setCategoryModal(false)} />
           <div className="relative z-10 bg-white rounded-t-3xl w-full max-w-md p-4 pb-8 max-h-96 overflow-y-auto">
-            <div className="font-bold text-gray-700 mb-3 text-center">カテゴリを選択</div>
+            <div className="font-bold text-gray-900 mb-3 text-center">カテゴリを選択</div>
             <div className="grid grid-cols-3 gap-2">
-              {ALL_CATS.map((cat) => (
-                <button key={cat}
-                  onClick={() => { setEditingItem(prev => prev ? { ...prev, category: cat } : null); setCategoryModal(false); }}
-                  className={`py-2 px-1 rounded-xl text-xs text-left ${editingItem?.category === cat ? "bg-rose-400 text-white" : "bg-gray-50 text-gray-700"}`}>
-                  {EMOJI[cat]} {cat}
-                </button>
-              ))}
+              {ALL_CATS.map((cat) => {
+                const active = editingItem?.category === cat;
+                return (
+                  <button key={cat}
+                    onClick={() => { setEditingItem(prev => prev ? { ...prev, category: cat } : null); setCategoryModal(false); }}
+                    className={`py-2 px-2 rounded-xl text-xs text-left flex items-center gap-1.5 ${active ? "theme-solid text-white" : "bg-gray-50 text-gray-700"}`}>
+                    <CategoryIcon name={cat} className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
+                    <span className="truncate">{cat}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -126,13 +130,13 @@ export default function HistoryPage() {
               <div className="mb-3">
                 <label className="text-xs text-gray-700 font-semibold mb-1 block">商品名</label>
                 <input type="text" value={editingItem.name} onChange={(e) => setEditingItem(prev => prev ? { ...prev, name: e.target.value } : null)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
               </div>
               <div className="mb-3">
                 <label className="text-xs text-gray-700 font-semibold mb-1 block">カテゴリ</label>
                 <button onClick={() => setCategoryModal(true)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-left flex items-center gap-2">
-                  <span>{EMOJI[editingItem.category] ?? "📦"}</span>
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-left flex items-center gap-2 text-gray-800">
+                  <CategoryIcon name={editingItem.category} className="w-4 h-4 text-gray-700" strokeWidth={1.8} />
                   <span>{editingItem.category}</span>
                 </button>
               </div>
@@ -140,12 +144,12 @@ export default function HistoryPage() {
                 <div className="flex-1">
                   <label className="text-xs text-gray-700 font-semibold mb-1 block">単価</label>
                   <input type="number" value={editingItem.price} onChange={(e) => setEditingItem(prev => prev ? { ...prev, price: Number(e.target.value) } : null)}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
                 </div>
                 <div className="flex-1">
                   <label className="text-xs text-gray-700 font-semibold mb-1 block">個数</label>
                   <input type="number" value={editingItem.quantity} onChange={(e) => setEditingItem(prev => prev ? { ...prev, quantity: Number(e.target.value) } : null)}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
                 </div>
               </div>
             </div>
@@ -192,7 +196,7 @@ export default function HistoryPage() {
               className="flex-1 px-3 py-2 bg-gray-50 rounded-2xl text-xs text-gray-800 focus:outline-none border-0">
               <option value="all">すべてのカテゴリ</option>
               {MAJOR_CATEGORIES.map((m) => (
-                <option key={m} value={m}>{MAJOR_CATEGORY_EMOJI[m] ?? "📦"} {m}</option>
+                <option key={m} value={m}>{m}</option>
               ))}
             </select>
             <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}
@@ -218,15 +222,17 @@ export default function HistoryPage() {
             const major = dominantMajor(receipt.items as Item[]);
             const isExpanded = expandedId === receipt.id;
             return (
-              <div key={receipt.id} className="bg-white rounded-2xl mb-2 overflow-hidden shadow-sm">
+              <div key={receipt.id} className="bg-white rounded-2xl mb-2 overflow-hidden shadow-card relative">
+                <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: getMajorColor(major) }} />
                 <button onClick={() => setExpandedId(isExpanded ? null : receipt.id)}
-                  className="w-full flex justify-between items-center px-4 py-3 active:bg-gray-50 transition-colors">
+                  className="w-full flex justify-between items-center px-4 py-3 pl-5 active:bg-gray-50 transition-colors">
                   <div className="text-left min-w-0 flex-1">
                     <div className="font-bold text-sm text-gray-900 truncate">{receipt.store}</div>
-                    <div className="text-[11px] text-gray-600 mt-0.5">
+                    <div className="text-[11px] text-gray-600 mt-0.5 flex items-center gap-1.5">
                       <span className="tabular-nums">{dayjs(receipt.date).format("M/D")}</span>
-                      <span className="mx-1.5 text-gray-300">／</span>
-                      <span>{MAJOR_CATEGORY_EMOJI[major] ?? "📦"} {major}</span>
+                      <span className="text-gray-300">／</span>
+                      <MajorCategoryIcon name={major} className="w-3 h-3" strokeWidth={2} />
+                      <span>{major}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -237,11 +243,13 @@ export default function HistoryPage() {
                   </div>
                 </button>
                 {isExpanded && (
-                  <div className="px-3 pb-3 border-t border-gray-50">
+                  <div className="px-3 pb-3 pl-5 border-t border-gray-50">
                     {receipt.items.map((item: Item, i: number) => (
                       <button key={i} onClick={() => setEditingItem({ receiptId: receipt.id, itemId: item.id, name: item.name, price: item.price, quantity: item.quantity || 1, category: item.category })}
-                        className="w-full flex items-center gap-2 py-2 border-b border-gray-50 last:border-0 text-left">
-                        <span className="text-base">{EMOJI[item.category] ?? "📦"}</span>
+                        className="w-full flex items-center gap-3 py-2 border-b border-gray-50 last:border-0 text-left">
+                        <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                          <CategoryIcon name={item.category} className="w-4 h-4 text-gray-700" strokeWidth={1.8} />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-semibold text-gray-800 truncate">
                             {item.name}

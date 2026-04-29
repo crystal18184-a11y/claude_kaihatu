@@ -1,8 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { useNavStore } from "@/store/navStore";
+import { CategoryIcon } from "@/lib/categoryIcon";
+import { formatYen } from "@/lib/format";
 import type { Item, MajorCategory, Category } from "@/types";
 
 const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・穀物":"🍚","麺類":"🍜","調味料":"🧂","油・ドレッシング":"🫙","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","食事・テイクアウト（外食）":"🍱","食事（外食）":"🍽️","ドリンク（外食）":"🥤","アルコール（外食）":"🍺","デザート（外食）":"🍰","飲み会・居酒屋":"🍻","交通・外出":"🚃","趣味・娯楽":"🎮","サブスク・定額サービス":"📺","家賃・住宅費":"🏠","水道・光熱費":"💡","通信費":"📶","保険料":"🛡️","その他固定費":"💳","その他":"📦"};
@@ -64,13 +67,17 @@ export default function ManualPage() {
           <div className="relative bg-white rounded-t-3xl w-full max-w-md p-4 pb-8 max-h-96 overflow-y-auto">
             <div className="font-bold text-gray-700 mb-3 text-center">カテゴリを選択</div>
             <div className="grid grid-cols-3 gap-2">
-              {ALL_CATS.map((cat) => (
-                <button key={cat}
-                  onClick={() => { updateItem(categoryModal!, { category: cat as Category }); setCategoryModal(null); }}
-                  className={`py-2 px-1 rounded-xl text-xs text-left ${items[categoryModal]?.category === cat ? "bg-rose-400 text-white" : "bg-gray-50 text-gray-700"}`}>
-                  {EMOJI[cat]} {cat}
-                </button>
-              ))}
+              {ALL_CATS.map((cat) => {
+                const active = items[categoryModal]?.category === cat;
+                return (
+                  <button key={cat}
+                    onClick={() => { updateItem(categoryModal!, { category: cat as Category }); setCategoryModal(null); }}
+                    className={`py-2 px-2 rounded-xl text-xs text-left flex items-center gap-1.5 ${active ? "theme-solid text-white" : "bg-gray-50 text-gray-700"}`}>
+                    <CategoryIcon name={cat} className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
+                    <span className="truncate">{cat}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -86,17 +93,17 @@ export default function ManualPage() {
           <div className="mb-3">
             <label className="text-xs text-gray-700 font-semibold mb-1 block">日付</label>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
           </div>
           <div className="mb-3">
             <label className="text-xs text-gray-700 font-semibold mb-1 block">店名・サービス名</label>
             <input type="text" value={store} onChange={(e) => setStore(e.target.value)} placeholder="例：Netflix、東京電力"
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
           </div>
           <div>
             <label className="text-xs text-gray-700 font-semibold mb-1 block">店の種類</label>
             <select value={storeType} onChange={(e) => setStoreType(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400">
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]">
               {STORE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
@@ -105,38 +112,40 @@ export default function ManualPage() {
         <div className="mb-3">
           <div className="flex justify-between items-center mb-2">
             <div className="font-bold text-gray-800 text-sm">商品・内容</div>
-            <div className="text-sm font-bold text-rose-400">合計 ¥{total.toLocaleString()}</div>
+            <div className="text-sm font-bold text-gray-900 tabular-nums">合計 {formatYen(total)}</div>
           </div>
 
           {items.map((item, i) => (
-            <div key={item.id} className="bg-white rounded-2xl p-3 shadow-sm mb-2">
+            <div key={item.id} className="bg-white rounded-2xl p-3 shadow-card mb-2">
               <div className="flex items-center gap-2 mb-2">
                 <button onClick={() => setCategoryModal(i)}
-                  className="text-2xl w-10 h-10 flex items-center justify-center bg-rose-50 rounded-xl flex-shrink-0">
-                  {EMOJI[item.category] ?? "📦"}
+                  className="w-10 h-10 flex items-center justify-center theme-bg-light rounded-xl flex-shrink-0">
+                  <CategoryIcon name={item.category} className="w-5 h-5 theme-text" strokeWidth={1.8} />
                 </button>
                 <input type="text" value={item.name} onChange={(e) => updateItem(i, { name: e.target.value })}
                   placeholder="商品名・内容"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
                 {items.length > 1 && (
-                  <button onClick={() => removeItem(i)} className="text-red-300 text-lg flex-shrink-0">✕</button>
+                  <button onClick={() => removeItem(i)} className="text-gray-400 hover:text-red-500 flex-shrink-0">
+                    <X className="w-5 h-5" strokeWidth={2} />
+                  </button>
                 )}
               </div>
               <div className="flex gap-2 ml-12">
                 <div className="flex-1">
                   <label className="text-xs text-gray-700 font-medium mb-0.5 block">単価</label>
                   <input type="number" value={item.price} onChange={(e) => updateItem(i, { price: Number(e.target.value) })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:border-rose-400" />
+                    className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:border-[var(--c-accent)]" />
                 </div>
                 <div className="flex-1">
                   <label className="text-xs text-gray-700 font-medium mb-0.5 block">個数</label>
                   <input type="number" value={item.quantity} onChange={(e) => updateItem(i, { quantity: Number(e.target.value) })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:border-rose-400" />
+                    className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:border-[var(--c-accent)]" />
                 </div>
                 <div className="flex-1">
                   <label className="text-xs text-gray-700 font-medium mb-0.5 block">小計</label>
-                  <div className="px-3 py-1.5 text-sm font-bold text-rose-400">
-                    ¥{(item.price * item.quantity).toLocaleString()}
+                  <div className="px-3 py-1.5 text-sm font-bold text-gray-900 tabular-nums">
+                    {formatYen(item.price * item.quantity)}
                   </div>
                 </div>
               </div>
@@ -144,7 +153,7 @@ export default function ManualPage() {
           ))}
 
           <button onClick={addItem}
-            className="w-full py-3 border-2 border-dashed border-rose-200 rounded-2xl text-rose-400 font-bold text-sm">
+            className="w-full py-3 border-2 border-dashed border-[var(--c-mid)] rounded-2xl theme-text font-bold text-sm">
             ＋ 商品を追加
           </button>
         </div>

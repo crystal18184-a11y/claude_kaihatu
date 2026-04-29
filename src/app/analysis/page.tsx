@@ -3,10 +3,8 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { useStore } from "@/store/useStore";
 import { formatYen } from "@/lib/format";
+import { MajorCategoryIcon, getMajorColor } from "@/lib/categoryIcon";
 import type { Item } from "@/types";
-
-const MAJOR_EMOJI: Record<string, string> = {"食費":"🛒","日用品・生活":"🏠","ファッション":"👗","電化製品・家電":"📱","子ども・教育":"🎒","外食・グルメ":"🍽️","娯楽・その他":"🎡","固定費・サブスク":"💳"};
-const MAJOR_COLOR: Record<string, string> = {"食費":"#20C7B5","日用品・生活":"#4A9FD4","ファッション":"#F65F8B","電化製品・家電":"#7B61D4","子ども・教育":"#F0A500","外食・グルメ":"#F59E0B","娯楽・その他":"#FF7043","固定費・サブスク":"#94A3B8"};
 
 export default function AnalysisPage() {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
@@ -87,8 +85,9 @@ export default function AnalysisPage() {
               </div>
               <div className="bg-white rounded-3xl p-4 shadow-sm">
                 <div className="text-[11px] text-gray-500 font-medium mb-1">最多カテゴリ</div>
-                <div className="text-base font-bold text-gray-900 truncate">
-                  {MAJOR_EMOJI[topCategory] ?? "📦"} {topCategory}
+                <div className="text-base font-bold text-gray-900 truncate flex items-center gap-1.5">
+                  <MajorCategoryIcon name={topCategory} className="w-4 h-4 flex-shrink-0" strokeWidth={2} style={{ color: getMajorColor(topCategory) }} />
+                  <span className="truncate">{topCategory}</span>
                 </div>
               </div>
               <div className="bg-white rounded-3xl p-4 shadow-sm">
@@ -104,16 +103,20 @@ export default function AnalysisPage() {
               <div className="font-bold text-gray-900 mb-4">カテゴリ別支出</div>
               {sortedMajors.map(([cat, amt]) => {
                 const pct = totalSpent > 0 ? Math.round((amt / totalSpent) * 100) : 0;
+                const color = getMajorColor(cat);
                 return (
                   <div key={cat} className="mb-3 last:mb-0">
                     <div className="flex justify-between items-baseline mb-1">
-                      <span className="text-sm text-gray-800">{MAJOR_EMOJI[cat] || "📦"} {cat}</span>
+                      <span className="text-sm text-gray-800 flex items-center gap-1.5">
+                        <MajorCategoryIcon name={cat} className="w-4 h-4" strokeWidth={2} style={{ color }} />
+                        {cat}
+                      </span>
                       <span className="text-xs text-gray-500 tabular-nums">
                         <span className="font-bold text-gray-900 mr-2">{formatYen(amt)}</span>{pct}%
                       </span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: MAJOR_COLOR[cat] || "#9CA3AF" }} />
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
                     </div>
                   </div>
                 );

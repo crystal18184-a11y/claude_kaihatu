@@ -6,6 +6,7 @@ import { Camera, ChevronRight } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { useNavStore } from "@/store/navStore";
 import { formatYen, formatYenCompact } from "@/lib/format";
+import { CategoryIcon } from "@/lib/categoryIcon";
 import type { Item, MajorCategory } from "@/types";
 
 const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・穀物":"🍚","麺類":"🍜","調味料":"🧂","油・ドレッシング":"🫙","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","食事・テイクアウト（外食）":"🍱","食事（外食）":"🍽️","ドリンク（外食）":"🥤","アルコール（外食）":"🍺","デザート（外食）":"🍰","飲み会・居酒屋":"🍻","交通・外出":"🚃","趣味・娯楽":"🎮","その他":"📦"};
@@ -114,18 +115,22 @@ export default function Home() {
         <div className="fixed inset-0 z-[60] flex items-end justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setCategoryModal(false)} />
           <div className="relative z-10 bg-white rounded-t-3xl w-full max-w-md p-4 pb-8 max-h-96 overflow-y-auto">
-            <div className="font-bold text-gray-800 mb-3 text-center">カテゴリを選択</div>
+            <div className="font-bold text-gray-900 mb-3 text-center">カテゴリを選択</div>
             <div className="grid grid-cols-3 gap-2">
-              {ALL_CATS.map((cat) => (
-                <button key={cat}
-                  onClick={() => {
-                    setEditingItem(prev => prev ? { ...prev, category: cat } : null);
-                    setCategoryModal(false);
-                  }}
-                  className={`py-2 px-1 rounded-xl text-xs text-left ${editingItem?.category === cat ? "bg-rose-400 text-white" : "bg-gray-50 text-gray-700"}`}>
-                  {EMOJI[cat]} {cat}
-                </button>
-              ))}
+              {ALL_CATS.map((cat) => {
+                const active = editingItem?.category === cat;
+                return (
+                  <button key={cat}
+                    onClick={() => {
+                      setEditingItem(prev => prev ? { ...prev, category: cat } : null);
+                      setCategoryModal(false);
+                    }}
+                    className={`py-2 px-2 rounded-xl text-xs text-left flex items-center gap-1.5 ${active ? "theme-solid text-white" : "bg-gray-50 text-gray-700"}`}>
+                    <CategoryIcon name={cat} className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
+                    <span className="truncate">{cat}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -144,13 +149,13 @@ export default function Home() {
               <div className="mb-3">
                 <label className="text-xs text-gray-700 font-semibold mb-1 block">商品名</label>
                 <input type="text" value={editingItem.name} onChange={(e) => setEditingItem(prev => prev ? { ...prev, name: e.target.value } : null)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
               </div>
               <div className="mb-3">
                 <label className="text-xs text-gray-700 font-semibold mb-1 block">カテゴリ</label>
                 <button onClick={() => setCategoryModal(true)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-left flex items-center gap-2">
-                  <span>{EMOJI[editingItem.category] ?? "📦"}</span>
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-left flex items-center gap-2 text-gray-800">
+                  <CategoryIcon name={editingItem.category} className="w-4 h-4 text-gray-700" strokeWidth={1.8} />
                   <span>{editingItem.category}</span>
                 </button>
               </div>
@@ -158,12 +163,12 @@ export default function Home() {
                 <div className="flex-1">
                   <label className="text-xs text-gray-700 font-semibold mb-1 block">単価</label>
                   <input type="number" value={editingItem.price} onChange={(e) => setEditingItem(prev => prev ? { ...prev, price: Number(e.target.value) } : null)}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
                 </div>
                 <div className="flex-1">
                   <label className="text-xs text-gray-700 font-semibold mb-1 block">個数</label>
                   <input type="number" value={editingItem.quantity} onChange={(e) => setEditingItem(prev => prev ? { ...prev, quantity: Number(e.target.value) } : null)}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
                 </div>
               </div>
             </div>
@@ -266,15 +271,15 @@ export default function Home() {
                     <div className="p-4">
                       <div className="mb-3">
                         <label className="text-xs text-gray-700 font-semibold mb-1 block">日付</label>
-                        <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                        <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
                       </div>
                       <div className="mb-3">
                         <label className="text-xs text-gray-700 font-semibold mb-1 block">店名</label>
-                        <input type="text" value={editStore} onChange={(e) => setEditStore(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                        <input type="text" value={editStore} onChange={(e) => setEditStore(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
                       </div>
                       <div className="mb-4">
                         <label className="text-xs text-gray-700 font-semibold mb-1 block">合計金額</label>
-                        <input type="number" value={editTotal} onChange={(e) => setEditTotal(Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-rose-400" />
+                        <input type="number" value={editTotal} onChange={(e) => setEditTotal(Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:border-[var(--c-accent)]" />
                       </div>
                       <div className="flex gap-2">
                         <button onClick={() => setEditingReceipt(null)} className="flex-1 py-2 bg-gray-100 rounded-xl text-sm font-bold text-gray-600">キャンセル</button>
@@ -283,33 +288,33 @@ export default function Home() {
                     </div>
                   ) : (
                     <>
-                      <div className="flex justify-between items-center p-4 border-b border-rose-50">
+                      <div className="flex justify-between items-center p-4 border-b border-gray-50">
                         <div>
                           <div className="font-bold text-sm text-gray-900">{receipt.store}</div>
                           <div className="text-xs text-gray-500">{receipt.storeType}</div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="font-bold text-rose-400 text-lg">¥{receipt.total.toLocaleString()}</div>
-                          <button onClick={() => startEditReceipt(receipt)} className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">編集</button>
-                          <button onClick={() => handleDelete(receipt.id)} className="text-xs text-red-400 bg-red-50 px-2 py-1 rounded-lg">削除</button>
+                          <div className="font-bold text-gray-900 text-base tabular-nums">{formatYen(receipt.total)}</div>
+                          <button onClick={() => startEditReceipt(receipt)} className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-lg">編集</button>
+                          <button onClick={() => handleDelete(receipt.id)} className="text-xs text-red-500 bg-red-50 px-2 py-1 rounded-lg">削除</button>
                         </div>
                       </div>
                       <div className="p-3">
                         {(expandedIds.includes(receipt.id) ? receipt.items : receipt.items.slice(0, 3)).map((item: Item, i: number) => (
                           <button key={i} onClick={() => startEditItem(receipt.id, item)}
-                            className="w-full flex items-center gap-2 py-1 border-b border-gray-50 last:border-0 text-left">
-                            <span>{EMOJI[item.category] ?? "📦"}</span>
-                            <span className="flex-1 text-xs text-gray-800">
+                            className="w-full flex items-center gap-2 py-1.5 border-b border-gray-50 last:border-0 text-left">
+                            <CategoryIcon name={item.category} className="w-4 h-4 text-gray-600 flex-shrink-0" strokeWidth={1.8} />
+                            <span className="flex-1 text-xs text-gray-800 truncate">
                               {item.name}
-                              {(item.quantity || 1) > 1 && <span className="text-rose-400 font-bold ml-1">×{item.quantity}</span>}
+                              {(item.quantity || 1) > 1 && <span className="theme-text font-bold ml-1">×{item.quantity}</span>}
                             </span>
-                            {item.wasteTags?.length > 0 && <span className="text-xs bg-rose-100 text-rose-400 px-2 py-0.5 rounded-full">{item.wasteTags[0]}</span>}
-                            <span className="text-xs font-bold text-gray-800">¥{((item.price || 0) * (item.quantity || 1)).toLocaleString()}</span>
+                            {item.wasteTags?.length > 0 && <span className="text-[10px] bg-[#FEE7EE] text-[#F65F8B] px-2 py-0.5 rounded-full">{item.wasteTags[0]}</span>}
+                            <span className="text-xs font-bold text-gray-900 tabular-nums">{formatYen((item.price || 0) * (item.quantity || 1))}</span>
                           </button>
                         ))}
                         {receipt.items.length > 3 && (
-                          <button onClick={() => toggleExpand(receipt.id)} className="w-full text-xs text-center text-rose-400 mt-2 py-1">
-                            {expandedIds.includes(receipt.id) ? "▲ 閉じる" : `▼ 他${receipt.items.length - 3}件を見る`}
+                          <button onClick={() => toggleExpand(receipt.id)} className="w-full text-xs text-center theme-text mt-2 py-1 font-medium">
+                            {expandedIds.includes(receipt.id) ? "閉じる" : `他${receipt.items.length - 3}件を見る`}
                           </button>
                         )}
                       </div>

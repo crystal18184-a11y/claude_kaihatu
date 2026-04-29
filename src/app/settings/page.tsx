@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { useThemeStore, THEMES, THEME_KEYS } from "@/store/themeStore";
 import { formatYen } from "@/lib/format";
+import { CategoryIcon } from "@/lib/categoryIcon";
 import type { MajorCategory } from "@/types";
 
 const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・穀物":"🍚","麺類":"🍜","調味料":"🧂","油・ドレッシング":"🫙","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","食事・テイクアウト（外食）":"🍱","食事（外食）":"🍽️","ドリンク（外食）":"🥤","アルコール（外食）":"🍺","デザート（外食）":"🍰","飲み会・居酒屋":"🍻","交通・外出":"🚃","趣味・娯楽":"🎮","サブスク・定額サービス":"📺","家賃・住宅費":"🏠","水道・光熱費":"💡","通信費":"📶","保険料":"🛡️","その他固定費":"💳","その他":"📦"};
@@ -60,12 +61,16 @@ export default function SettingsPage() {
           <div className="relative bg-white rounded-t-3xl w-full max-w-md p-4 pb-8 max-h-96 overflow-y-auto">
             <div className="font-bold text-gray-800 mb-3 text-center">カテゴリを選択</div>
             <div className="grid grid-cols-3 gap-2">
-              {ALL_CATS.map((cat) => (
-                <button key={cat} onClick={() => { setNewFixed(prev => ({ ...prev, category: cat })); setCategoryModal(false); }}
-                  className={`py-2 px-1 rounded-xl text-xs text-left ${newFixed.category === cat ? "bg-rose-400 text-white" : "bg-gray-50 text-gray-700"}`}>
-                  {EMOJI[cat]} {cat}
-                </button>
-              ))}
+              {ALL_CATS.map((cat) => {
+                const active = newFixed.category === cat;
+                return (
+                  <button key={cat} onClick={() => { setNewFixed(prev => ({ ...prev, category: cat })); setCategoryModal(false); }}
+                    className={`py-2 px-2 rounded-xl text-xs text-left flex items-center gap-1.5 ${active ? "theme-solid text-white" : "bg-gray-50 text-gray-700"}`}>
+                    <CategoryIcon name={cat} className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
+                    <span className="truncate">{cat}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -137,7 +142,9 @@ export default function SettingsPage() {
 
           {fixedCosts?.map((f) => (
             <div key={f.id} className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0">
-              <span className="text-2xl">{EMOJI[f.category] ?? "💳"}</span>
+              <div className="w-9 h-9 rounded-xl theme-bg-light flex items-center justify-center flex-shrink-0">
+                <CategoryIcon name={f.category} className="w-4 h-4 theme-text" strokeWidth={1.8} />
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="font-bold text-sm text-gray-900 truncate">{f.name}</div>
                 <div className="text-xs text-gray-500 tabular-nums">毎月{f.dayOfMonth}日 {formatYen(f.amount)}</div>
@@ -175,7 +182,7 @@ export default function SettingsPage() {
                 <label className="text-xs text-gray-700 font-semibold mb-1 block">カテゴリ</label>
                 <button onClick={() => setCategoryModal(true)}
                   className="w-full border border-gray-200 rounded-2xl px-3 py-2 text-sm text-left flex items-center gap-2 bg-white">
-                  <span>{EMOJI[newFixed.category] ?? "📦"}</span>
+                  <CategoryIcon name={newFixed.category} className="w-4 h-4 text-gray-700" strokeWidth={1.8} />
                   <span className="text-gray-800">{newFixed.category}</span>
                 </button>
               </div>
