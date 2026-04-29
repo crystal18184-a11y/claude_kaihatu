@@ -7,6 +7,7 @@ import { useStore } from "@/store/useStore";
 import { useNavStore } from "@/store/navStore";
 import { formatYen, formatYenCompact } from "@/lib/format";
 import { CategoryIcon } from "@/lib/categoryIcon";
+import { buildHomeInsight, todayCommentary, weekCommentary, dayIntensity, type DayIntensity } from "@/lib/insights";
 import type { Item, MajorCategory } from "@/types";
 
 const EMOJI: Record<string, string> = {"肉類":"🥩","魚介類":"🐟","卵":"🥚","乳製品":"🥛","野菜":"🥦","果物":"🍎","きのこ":"🍄","海藻・乾物":"🌿","豆腐・大豆製品":"🫘","漬物・発酵食品":"🥒","パン":"🍞","米・穀物":"🍚","麺類":"🍜","調味料":"🧂","油・ドレッシング":"🫙","飲み物":"🧃","お菓子・スナック":"🍬","アイス・冷菓":"🍦","冷凍食品":"❄️","レトルト・缶詰":"🥫","日用品":"🧴","医療・薬":"💊","化粧品・美容":"💄","衣服・靴":"👟","バッグ・アクセサリー":"👜","家電":"🔌","スマホ・PC・ガジェット":"📱","子ども用品":"🧸","文具・おもちゃ":"✏️","習い事・教育費":"📚","食事・テイクアウト（外食）":"🍱","食事（外食）":"🍽️","ドリンク（外食）":"🥤","アルコール（外食）":"🍺","デザート（外食）":"🍰","飲み会・居酒屋":"🍻","交通・外出":"🚃","趣味・娯楽":"🎮","その他":"📦"};
@@ -61,12 +62,32 @@ export default function Home() {
   const weekTotal = isCurrentMonth
     ? monthReceipts.filter((r) => dayjs(r.date).isAfter(weekStart.subtract(1, "day"))).reduce((s, r) => s + r.total, 0)
     : 0;
-  const daysLeft = isCurrentMonth ? Math.max(daysInMonth - today.date() + 1, 1) : daysInMonth;
+  const todayDate = today.date();
+  const daysPassed = isCurrentMonth ? todayDate : daysInMonth;
+  const daysLeft = isCurrentMonth ? Math.max(daysInMonth - todayDate + 1, 1) : daysInMonth;
   const dailyAllowance = Math.max(Math.floor(remaining / daysLeft), 0);
+  const dailyAvg = daysPassed > 0 ? totalSpent / daysPassed : 0;
+
+  const insight = buildHomeInsight({
+    isCurrentMonth, totalSpent, budget, daysInMonth, todayDate, daysLeft, dailyAllowance,
+    monthLabel: currentMonth.format("M月"),
+  });
+  const todayNote = isCurrentMonth ? todayCommentary(todayTotal) : "";
+  const weekNote = isCurrentMonth ? weekCommentary({ weekTotal, totalSpent, daysPassed }) : "";
 
   const recentReceipts = [...monthReceipts].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
 
   const goToScan = () => { setDirection("forward"); router.push("/scan"); };
+
+  const intensityClass = (intensity: DayIntensity, isSelected: boolean): string => {
+    if (isSelected) return "";
+    switch (intensity) {
+      case "low":  return "bg-[var(--c-light)] theme-text";
+      case "mid":  return "bg-[var(--c-mid)]/60 theme-text";
+      case "high": return "bg-[#FEE7EE] text-[#F65F8B]";
+      default:     return "";
+    }
+  };
 
   const getDayTotal = (day: number) => {
     const date = currentMonth.format(`YYYY-MM-${String(day).padStart(2, "0")}`);
@@ -109,7 +130,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#FAF7F8] w-full max-w-md mx-auto pb-28">
+    <div className="min-h-dvh bg-[#FAF7F8] w-full max-w-md mx-auto pb-32">
       {/* カテゴリモーダル */}
       {categoryModal && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center">
@@ -210,33 +231,40 @@ export default function Home() {
       </div>
 
       <div className="px-5 pt-4">
+        {/* 一言診断 */}
+        {insight && (
+          <div className="text-[12px] text-gray-700 mb-3 px-1">{insight}</div>
+        )}
+
         {/* Today / Week stats */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white rounded-3xl p-4 shadow-sm">
+          <div className="bg-white rounded-3xl p-4 shadow-card">
             <div className="text-[11px] text-gray-500 font-medium mb-1">今日の支出</div>
             <div className="text-lg font-bold text-gray-900 tabular-nums">{formatYen(todayTotal)}</div>
+            {todayNote && <div className="text-[10px] text-gray-500 mt-1">{todayNote}</div>}
           </div>
-          <div className="bg-white rounded-3xl p-4 shadow-sm">
+          <div className="bg-white rounded-3xl p-4 shadow-card">
             <div className="text-[11px] text-gray-500 font-medium mb-1">今週の支出</div>
             <div className="text-lg font-bold text-gray-900 tabular-nums">{formatYen(weekTotal)}</div>
+            {weekNote && <div className="text-[10px] text-gray-500 mt-1">{weekNote}</div>}
           </div>
         </div>
 
         {/* Receipt CTA */}
         <button onClick={goToScan}
-          className="w-full bg-white rounded-3xl p-4 shadow-sm mb-4 flex items-center gap-4 active:scale-[0.99] transition-transform text-left">
+          className="w-full bg-white rounded-3xl p-4 shadow-card mb-4 flex items-center gap-4 active:scale-[0.99] transition-transform text-left">
           <div className="w-12 h-12 theme-grad rounded-2xl flex items-center justify-center flex-shrink-0">
             <Camera className="w-6 h-6 text-white" strokeWidth={2.2} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-bold text-gray-900 text-sm">レシートを撮るだけで自動登録</div>
-            <div className="text-[11px] text-gray-500 mt-0.5">店名・日付・金額を読み取ります</div>
+            <div className="text-[11px] text-gray-500 mt-0.5">店名・日付・金額・カテゴリを自動入力</div>
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
         </button>
 
         {/* Calendar */}
-        <div className="bg-white rounded-3xl p-4 shadow-sm">
+        <div className="bg-white rounded-3xl p-4 shadow-card">
           <div className="grid grid-cols-7 mb-2">
             {["日","月","火","水","木","金","土"].map((d) => (<div key={d} className="text-center text-[11px] text-gray-500 font-bold">{d}</div>))}
           </div>
@@ -247,15 +275,27 @@ export default function Home() {
               const dayTotal = getDayTotal(day);
               const isSelected = selectedDate === date;
               const isToday = date === dayjs().format("YYYY-MM-DD");
+              const intensity = dayIntensity(dayTotal, dailyAvg);
               const hasReceipt = dayTotal > 0;
+              const heatClass = intensityClass(intensity, isSelected);
               return (
                 <button key={i} onClick={() => setSelectedDate(isSelected ? null : date)}
-                  className={`aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 text-xs text-gray-700 transition-all ${isSelected ? "theme-solid text-white" : ""} ${isToday && !isSelected ? "border-2 theme-border font-bold theme-text" : ""} ${hasReceipt && !isSelected ? "theme-bg-light" : ""}`}>
+                  className={`aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 text-xs text-gray-700 transition-all ${isSelected ? "theme-solid text-white" : heatClass} ${isToday && !isSelected ? "ring-2 ring-[var(--c-accent)] font-bold" : ""}`}>
                   <span className={hasReceipt ? "font-bold" : ""}>{day}</span>
-                  {hasReceipt && <span className={`text-[9px] tabular-nums leading-none ${isSelected ? "text-white" : "theme-text"}`}>{formatYenCompact(dayTotal)}</span>}
+                  {hasReceipt && <span className={`text-[9px] tabular-nums leading-none ${isSelected ? "text-white" : ""}`}>{formatYenCompact(dayTotal)}</span>}
                 </button>
               );
             })}
+          </div>
+          {/* heatmap legend */}
+          <div className="mt-3 flex items-center gap-2 text-[10px] text-gray-500">
+            <span>少</span>
+            <div className="flex gap-1">
+              <div className="w-3 h-3 rounded bg-[var(--c-light)]" />
+              <div className="w-3 h-3 rounded bg-[var(--c-mid)]/60" />
+              <div className="w-3 h-3 rounded bg-[#FEE7EE]" />
+            </div>
+            <span>多</span>
           </div>
         </div>
 
